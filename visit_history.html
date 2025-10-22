@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visit History - Oscar's System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            padding: 20px 10px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin: 0 0 10px 0;
+        }
+        
+        .back-button {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Data Management Controls */
+        .data-controls {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .import-btn {
+            background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+        }
+        
+        .backup-btn {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        
+        .clear-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+        }
+        
+        /* Search and Filter Controls */
+        .search-controls {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .search-input, .filter-select {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        /* Statistics Dashboard */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+        
+        /* Visit History Table */
+        .history-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .history-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .history-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-scheduled {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn:hover,
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .history-table {
+                font-size: 12px;
+            }
+            
+            .history-table th,
+            .history-table td {
+                padding: 8px 4px;
+            }
+        }
+        
+        /* Loading and Empty States */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.error {
+            background: #dc3545;
+        }
+        
+        .toast.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-button">← Back to Dashboard</a>
+            <h1>📊 Visit History & Data Management</h1>
+            <p>Comprehensive visit tracking with large capacity storage and data extraction</p>
+        </div>
+        
+        <!-- Data Management Controls -->
+        <div class="data-controls">
+            <h3>🔧 Data Management</h3>
+            <div class="control-grid">
+                <button class="control-btn export-btn" onclick="exportAllData()">
+                    📊 Export All Data
+                </button>
+                <button class="control-btn export-btn" onclick="exportVisitHistory()">
+                    📋 Export Visit History
+                </button>
+                <button class="control-btn export-btn" onclick="exportHotelData()">
+                    🏨 Export Hotel Database
+                </button>
+                <button class="control-btn import-btn" onclick="importData()">
+                    📥 Import Data
+                </button>
+                <button class="control-btn backup-btn" onclick="createBackup()">
+                    💾 Create Backup
+                </button>
+                <button class="control-btn backup-btn" onclick="restoreBackup()">
+                    🔄 Restore Backup
+                </button>
+                <button class="control-btn" onclick="optimizeStorage()">
+                    ⚡ Optimize Storage
+                </button>
+                <button class="control-btn clear-btn" onclick="clearOldData()">
+                    🗑️ Clear Old Data
+                </button>
+            </div>
+            <div id="storageInfo" class="storage-info">
+                <small>Storage Usage: <span id="storageUsage">Calculating...</span></small>
+            </div>
+        </div>
+        
+        <!-- Search and Filter Controls -->
+        <div class="search-controls">
+            <h3>🔍 Search & Filter</h3>
+            <div class="search-grid">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search visits, hotels, contacts..." onkeyup="searchHistory()">
+                <select class="filter-select" id="statusFilter" onchange="filterHistory()">
+                    <option value="">All Statuses</option>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="in-progress">In Progress</option>
+                </select>
+                <select class="filter-select" id="hotelFilter" onchange="filterHistory()">
+                    <option value="">All Hotels</option>
+                </select>
+                <input type="date" class="search-input" id="dateFromFilter" onchange="filterHistory()">
+                <input type="date" class="search-input" id="dateToFilter" onchange="filterHistory()">
+                <button class="control-btn" onclick="resetFilters()">🔄 Reset Filters</button>
+            </div>
+        </div>
+        
+        <!-- Statistics Dashboard -->
+        <div class="stats-dashboard">
+            <div class="stat-card">
+                <div class="stat-number" id="totalVisits">0</div>
+                <div class="stat-label">Total Visits</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedVisits">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="scheduledVisits">0</div>
+                <div class="stat-label">Scheduled</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="uniqueHotels">0</div>
+                <div class="stat-label">Hotels Visited</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="thisMonthVisits">0</div>
+                <div class="stat-label">This Month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgDuration">0</div>
+                <div class="stat-label">Avg Duration (min)</div>
+            </div>
+        </div>
+        
+        <!-- Visit History Table -->
+        <div class="history-container">
+            <h3>📋 Visit History</h3>
+            <div id="historyContent">
+                <div class="loading">
+                    <p>Loading visit history...</p>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination" id="pagination" style="display: none;">
+                <button class="page-btn" onclick="changePage(-1)">← Previous</button>
+                <span id="pageInfo">Page 1 of 1</span>
+                <button class="page-btn" onclick="changePage(1)">Next →</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden file input for import -->
+    <input type="file" id="fileInput" accept=".json,.csv" style="display: none;" onchange="handleFileImport(event)">
+    
+    <script>
+        // Enhanced Data Storage System
+        class EnhancedDataManager {
+            constructor() {
+                this.storagePrefix = 'oscar_hotel_';
+                this.maxStorageSize = 50 * 1024 * 1024; // 50MB limit
+                this.currentPage = 1;
+                this.itemsPerPage = 50;
+                this.filteredData = [];
+                this.allVisits = [];
+                
+                this.init();
+            }
+            
+            init() {
+                this.loadAllData();
+                this.updateStorageInfo();
+                this.populateFilters();
+                this.displayHistory();
+                this.updateStatistics();
+            }
+            
+            // Large Capacity Storage Management
+            loadAllData() {
+                try {
+                    // Load visits with pagination support
+                    const visits = this.getStorageData('visits') || [];
+                    const hotels = this.getStorageData('hotels') || [];
+                    const accounts = this.getStorageData('accounts') || [];
+                    
+                    this.allVisits = visits;
+                    this.filteredData = [...visits];
+                    
+                    console.log(`Loaded ${visits.length} visits, ${hotels.length} hotels`);
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    this.showToast('Error loading data', 'error');
+                }
+            }
+            
+            getStorageData(key) {
+                try {
+                    const data = localStorage.getItem(this.storagePrefix + key);
+                    return data ? JSON.parse(data) : null;
+                } catch (error) {
+                    console.error(`Error parsing ${key}:`, error);
+                    return null;
+                }
+            }
+            
+            setStorageData(key, data) {
+                try {
+                    const jsonData = JSON.stringify(data);
+                    
+                    // Check storage size
+                    if (jsonData.length > this.maxStorageSize) {
+                        this.optimizeStorage();
+                    }
+                    
+                    localStorage.setItem(this.storagePrefix + key, jsonData);
+                    this.updateStorageInfo();
+                } catch (error) {
+                    console.error(`Error saving ${key}:`, error);
+                    this.showToast('Storage error - data may not be saved', 'error');
+                }
+            }
+            
+            // Storage Optimization
+            optimizeStorage() {
+                try {
+                    // Remove old completed visits (older than 2 years)
+                    const twoYearsAgo = new Date();
+                    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+                    
+                    const visits = this.getStorageData('visits') || [];
+                    const optimizedVisits = visits.filter(visit => {
+                        const visitDate = new Date(visit.date);
+                        return visitDate > twoYearsAgo || visit.status !== 'completed';
+                    });
+                    
+                    this.setStorageData('visits', optimizedVisits);
+                    this.showToast(`Optimized storage - removed ${visits.length - optimizedVisits.length} old visits`);
+                    
+                    this.loadAllData();
+                    this.displayHistory();
+                } catch (error) {
+                    console.error('Error optimizing storage:', error);
+                    this.showToast('Error optimizing storage', 'error');
+                }
+            }
+            
+            updateStorageInfo() {
+                try {
+                    let totalSize = 0;
+                    for (let key in localStorage) {
+                        if (key.startsWith(this.storagePrefix)) {
+                            totalSize += localStorage[key].length;
+                        }
+                    }
+                    
+                    const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
+                    const percentage = ((totalSize / this.maxStorageSize) * 100).toFixed(1);
+                    
+                    document.getElementById('storageUsage').textContent = 
+                        `${sizeInMB} MB (${percentage}%) of 50 MB limit`;
+                } catch (error) {
+                    console.error('Error updating storage info:', error);
+                }
+            }
+            
+            // Data Export Functions
+            exportAllData() {
+                try {
+                    const allData = {
+                        visits: this.getStorageData('visits') || [],
+                        hotels: this.getStorageData('hotels') || [],
+                        accounts: this.getStorageData('accounts') || [],
+                        exportDate: new Date().toISOString(),
+                        version: '1.0'
+                    };
+                    
+                    this.downloadJSON(allData, `oscar_complete_backup_${this.getDateString()}.json`);
+                    this.showToast('Complete data exported successfully');
+                } catch (error) {
+                    console.error('Error exporting data:', error);
+                    this.showToast('Error exporting data', 'error');
+                }
+            }
+            
+            exportVisitHistory() {
+                try {
+                    const visits = this.filteredData.length > 0 ? this.filteredData : this.allVisits;
+                    const exportData = {
+                        visits: visits,
+                        exportDate: new Date().toISOString(),
+                        totalVisits: visits.length
+                    };
+                    
+                    this.downloadJSON(exportData, `oscar_visit_history_${this.getDateString()}.json`);
+                    this.showToast(`Exported ${visits.length} visits`);
+                } catch (error) {
+                    console.error('Error exporting visit history:', error);
+                    this.showToast('Error exporting visit history', 'error');
+                }
+            }
+            
+            exportHotelData() {
+                try {
+                    const hotels = this.getStorageData('hotels') || [];
+                    const exportData = {
+                        hotels: hotels,
+                        exportDate: new Date().toISOString(),
+                        totalHotels: hotels.length
+                    };
+                    
+                    this.downloadJSON(exportData, `oscar_hotel_database_${this.getDateString()}.json`);
+                    this.showToast(`Exported ${hotels.length} hotels`);
+                } catch (error) {
+                    console.error('Error exporting hotel data:', error);
+                    this.showToast('Error exporting hotel data', 'error');
+                }
+            }
+            
+            downloadJSON(data, filename) {
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            getDateString() {
+                return new Date().toISOString().split('T')[0];
+            }
+            
+            // Data Import Functions
+            importData() {
+                document.getElementById('fileInput').click();
+            }
+            
+            handleFileImport(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        if (importedData.visits) {
+                            const existingVisits = this.getStorageData('visits') || [];
+                            const mergedVisits = this.mergeData(existingVisits, importedData.visits, 'id');
+                            this.setStorageData('visits', mergedVisits);
+                        }
+                        
+                        if (importedData.hotels) {
+                            const existingHotels = this.getStorageData('hotels') || [];
+                            const mergedHotels = this.mergeData(existingHotels, importedData.hotels, 'id');
+                            this.setStorageData('hotels', mergedHotels);
+                        }
+                        
+                        this.showToast('Data imported successfully');
+                        this.loadAllData();
+                        this.displayHistory();
+                        this.updateStatistics();
+                    } catch (error) {
+                        console.error('Error importing data:', error);
+                        this.showToast('Error importing data - invalid format', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+            
+            mergeData(existing, imported, keyField) {
+                const merged = [...existing];
+                const existingIds = new Set(existing.map(item => item[keyField]));
+                
+                imported.forEach(item => {
+                    if (!existingIds.has(item[keyField])) {
+                        merged.push(item);
+                    }
+                });
+                
+                return merged;
+            }
+            
+            // Backup and Restore
+            createBackup() {
+                try {
+                    const backup = {
+                        visits: this.getStorageData('visits') || [],
+                        hotels: this.getStorageData('hotels') || [],
+                        accounts: this.getStorageData('accounts') || [],
+                        backupDate: new Date().toISOString(),
+                        version: '1.0'
+                    };
+                    
+                    // Store backup in localStorage
+                    this.setStorageData('backup_' + Date.now(), backup);
+                    
+                    // Also download backup file
+                    this.downloadJSON(backup, `oscar_backup_${this.getDateString()}.json`);
+                    
+                    this.showToast('Backup created successfully');
+                } catch (error) {
+                    console.error('Error creating backup:', error);
+                    this.showToast('Error creating backup', 'error');
+                }
+            }
+            
+            // Search and Filter Functions
+            searchHistory() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                
+                if (!searchTerm) {
+                    this.filteredData = [...this.allVisits];
+                } else {
+                    this.filteredData = this.allVisits.filter(visit => 
+                        visit.hotel?.toLowerCase().includes(searchTerm) ||
+                        visit.contact?.toLowerCase().includes(searchTerm) ||
+                        visit.notes?.toLowerCase().includes(searchTerm) ||
+                        visit.purpose?.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                this.currentPage = 1;
+                this.displayHistory();
+            }
+            
+            filterHistory() {
+                const statusFilter = document.getElementById('statusFilter').value;
+                const hotelFilter = document.getElementById('hotelFilter').value;
+                const dateFrom = document.getElementById('dateFromFilter').value;
+                const dateTo = document.getElementById('dateToFilter').value;
+                
+                this.filteredData = this.allVisits.filter(visit => {
+                    if (statusFilter && visit.status !== statusFilter) return false;
+                    if (hotelFilter && visit.hotel !== hotelFilter) return false;
+                    if (dateFrom && visit.date < dateFrom) return false;
+                    if (dateTo && visit.date > dateTo) return false;
+                    return true;
+                });
+                
+                this.currentPage = 1;
+                this.displayHistory();
+            }
+            
+            resetFilters() {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('hotelFilter').value = '';
+                document.getElementById('dateFromFilter').value = '';
+                document.getElementById('dateToFilter').value = '';
+                
+                this.filteredData = [...this.allVisits];
+                this.currentPage = 1;
+                this.displayHistory();
+            }
+            
+            populateFilters() {
+                const hotelFilter = document.getElementById('hotelFilter');
+                const uniqueHotels = [...new Set(this.allVisits.map(visit => visit.hotel))].sort();
+                
+                hotelFilter.innerHTML = '<option value="">All Hotels</option>';
+                uniqueHotels.forEach(hotel => {
+                    if (hotel) {
+                        const option = document.createElement('option');
+                        option.value = hotel;
+                        option.textContent = hotel;
+                        hotelFilter.appendChild(option);
+                    }
+                });
+            }
+            
+            // Display Functions
+            displayHistory() {
+                const container = document.getElementById('historyContent');
+                
+                if (this.filteredData.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No visits found</h3>
+                            <p>No visits match your current filters or search criteria.</p>
+                        </div>
+                    `;
+                    document.getElementById('pagination').style.display = 'none';
+                    return;
+                }
+                
+                // Pagination
+                const totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+                const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+                const endIndex = startIndex + this.itemsPerPage;
+                const pageData = this.filteredData.slice(startIndex, endIndex);
+                
+                // Generate table
+                let tableHTML = `
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Hotel</th>
+                                <th>Contact</th>
+                                <th>Purpose</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                pageData.forEach(visit => {
+                    const statusClass = `status-${visit.status || 'scheduled'}`;
+                    tableHTML += `
+                        <tr>
+                            <td>${this.formatDate(visit.date)}</td>
+                            <td>${visit.time || 'N/A'}</td>
+                            <td><strong>${visit.hotel || 'N/A'}</strong></td>
+                            <td>${visit.contact || 'N/A'}</td>
+                            <td>${visit.purpose || 'N/A'}</td>
+                            <td>${visit.duration || 'N/A'} min</td>
+                            <td><span class="status-badge ${statusClass}">${visit.status || 'scheduled'}</span></td>
+                            <td>
+                                <button class="control-btn" onclick="dataManager.viewVisit('${visit.id}')" style="padding: 4px 8px; font-size: 12px;">View</button>
+                                <button class="control-btn export-btn" onclick="dataManager.exportSingleVisit('${visit.id}')" style="padding: 4px 8px; font-size: 12px;">Export</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += '</tbody></table>';
+                container.innerHTML = tableHTML;
+                
+                // Update pagination
+                if (totalPages > 1) {
+                    document.getElementById('pagination').style.display = 'flex';
+                    document.getElementById('pageInfo').textContent = `Page ${this.currentPage} of ${totalPages}`;
+                } else {
+                    document.getElementById('pagination').style.display = 'none';
+                }
+            }
+            
+            formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                return date.toLocaleDateString();
+            }
+            
+            changePage(direction) {
+                const totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+                const newPage = this.currentPage + direction;
+                
+                if (newPage >= 1 && newPage <= totalPages) {
+                    this.currentPage = newPage;
+                    this.displayHistory();
+                }
+            }
+            
+            updateStatistics() {
+                const totalVisits = this.allVisits.length;
+                const completedVisits = this.allVisits.filter(v => v.status === 'completed').length;
+                const scheduledVisits = this.allVisits.filter(v => v.status === 'scheduled').length;
+                const uniqueHotels = new Set(this.allVisits.map(v => v.hotel)).size;
+                
+                // This month visits
+                const thisMonth = new Date().toISOString().slice(0, 7);
+                const thisMonthVisits = this.allVisits.filter(v => v.date?.startsWith(thisMonth)).length;
+                
+                // Average duration
+                const durations = this.allVisits.map(v => parseInt(v.duration) || 0).filter(d => d > 0);
+                const avgDuration = durations.length > 0 ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length) : 0;
+                
+                document.getElementById('totalVisits').textContent = totalVisits;
+                document.getElementById('completedVisits').textContent = completedVisits;
+                document.getElementById('scheduledVisits').textContent = scheduledVisits;
+                document.getElementById('uniqueHotels').textContent = uniqueHotels;
+                document.getElementById('thisMonthVisits').textContent = thisMonthVisits;
+                document.getElementById('avgDuration').textContent = avgDuration;
+            }
+            
+            // Utility Functions
+            showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => toast.classList.add('show'), 100);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => document.body.removeChild(toast), 300);
+                }, 3000);
+            }
+            
+            viewVisit(visitId) {
+                const visit = this.allVisits.find(v => v.id === visitId);
+                if (visit) {
+                    alert(`Visit Details:\n\nHotel: ${visit.hotel}\nDate: ${visit.date}\nTime: ${visit.time}\nContact: ${visit.contact}\nPurpose: ${visit.purpose}\nNotes: ${visit.notes || 'None'}`);
+                }
+            }
+            
+            exportSingleVisit(visitId) {
+                const visit = this.allVisits.find(v => v.id === visitId);
+                if (visit) {
+                    this.downloadJSON(visit, `visit_${visit.hotel}_${visit.date}.json`);
+                    this.showToast('Visit exported successfully');
+                }
+            }
+            
+            clearOldData() {
+                if (confirm('This will remove visits older than 1 year. Are you sure?')) {
+                    const oneYearAgo = new Date();
+                    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+                    
+                    const visits = this.getStorageData('visits') || [];
+                    const filteredVisits = visits.filter(visit => {
+                        const visitDate = new Date(visit.date);
+                        return visitDate > oneYearAgo;
+                    });
+                    
+                    this.setStorageData('visits', filteredVisits);
+                    this.showToast(`Removed ${visits.length - filteredVisits.length} old visits`);
+                    
+                    this.loadAllData();
+                    this.displayHistory();
+                    this.updateStatistics();
+                }
+            }
+        }
+        
+        // Initialize the enhanced data manager
+        let dataManager;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            dataManager = new EnhancedDataManager();
+        });
+        
+        // Global functions for button clicks
+        function exportAllData() { dataManager.exportAllData(); }
+        function exportVisitHistory() { dataManager.exportVisitHistory(); }
+        function exportHotelData() { dataManager.exportHotelData(); }
+        function importData() { dataManager.importData(); }
+        function createBackup() { dataManager.createBackup(); }
+        function restoreBackup() { dataManager.importData(); }
+        function optimizeStorage() { dataManager.optimizeStorage(); }
+        function clearOldData() { dataManager.clearOldData(); }
+        function searchHistory() { dataManager.searchHistory(); }
+        function filterHistory() { dataManager.filterHistory(); }
+        function resetFilters() { dataManager.resetFilters(); }
+        function changePage(direction) { dataManager.changePage(direction); }
+        function handleFileImport(event) { dataManager.handleFileImport(event); }
+    </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oscar's Hotel Visit Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #333;
+        }
+        
+        .feature-description {
+            color: #666;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .stats-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏨 Oscar's Hotel Visit Management System</h1>
+            <p>Professional Hotel Visit Strategy & Customer Relationship Management</p>
+        </div>
+        
+        <div class="stats-section">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">📊 System Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalHotels">42</div>
+                    <div class="stat-label">Total Hotels</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="scheduledVisits">0</div>
+                    <div class="stat-label">Scheduled Visits</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="completedVisits">0</div>
+                    <div class="stat-label">Completed Visits</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="outstandingInvoices">0</div>
+                    <div class="stat-label">Outstanding Invoices</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card" onclick="window.location.href='communication_hub.html'">
+                <div class="feature-icon">💬</div>
+                <div class="feature-title">Communication Hub</div>
+                <div class="feature-description">
+                    Chat with office team, access email templates, and communicate directly with customers
+                </div>
+            </div>
+            
+            <div class="feature-card" onclick="window.location.href='oscar_calendar.html'">
+                <div class="feature-icon">📅</div>
+                <div class="feature-title">Oscar's Calendar</div>
+                <div class="feature-description">
+                    Interactive calendar with live visits, scheduling, and direct access to visit forms
+                </div>
+            </div>
+            
+            <div class="feature-card" onclick="window.location.href='visit_scheduler.html'">
+                <div class="feature-icon">📋</div>
+                <div class="feature-title">Visit Scheduler</div>
+                <div class="feature-description">
+                    View future and past visit schedules with synchronized calendar integration
+                </div>
+            </div>
+            
+            <div class="feature-card" onclick="window.location.href='accounts_dashboard.html'">
+                <div class="feature-icon">💰</div>
+                <div class="feature-title">Accounts Dashboard</div>
+                <div class="feature-description">
+                    Complete invoice and commission management with real-time reconciliation
+                </div>
+            </div>
+            
+            <div class="feature-card" onclick="window.location.href='hotel_search.html'">
+                <div class="feature-icon">🔍</div>
+                <div class="feature-title">Hotel Search & History</div>
+                <div class="feature-description">
+                    Search visit records, view history, and generate comprehensive reports
+                </div>
+            </div>
+            
+            <div class="feature-card" onclick="window.location.href='hotel_management.html'">
+                <div class="feature-icon">🏨</div>
+                <div class="feature-title">Hotel Management</div>
+                <div class="feature-description">
+                    Manage hotel database, add new hotels, and update contact information
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Update dashboard statistics
+        async function updateDashboardStats() {
+            // Load hotels from database file first
+            let hotels = [];
+            try {
+                const response = await fetch('hotels_database.json');
+                if (response.ok) {
+                    hotels = await response.json();
+                }
+            } catch (error) {
+                console.error('Error loading hotels database:', error);
+                // Fallback to localStorage
+                hotels = JSON.parse(localStorage.getItem('hotelDatabase') || '[]');
+            }
+            
+            const scheduledVisits = JSON.parse(localStorage.getItem('scheduledVisits') || '{}');
+            const visitHistory = JSON.parse(localStorage.getItem('visitHistory') || '[]');
+            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            
+            // Update statistics with correct hotel count
+            document.getElementById('totalHotels').textContent = hotels.length || 111;
+            
+            let totalScheduled = 0;
+            Object.values(scheduledVisits).forEach(dayVisits => {
+                totalScheduled += dayVisits.length;
+            });
+            document.getElementById('scheduledVisits').textContent = totalScheduled;
+            
+            document.getElementById('completedVisits').textContent = visitHistory.length;
+            
+            const outstandingInvoices = invoices.filter(inv => inv.status === 'outstanding').length;
+            document.getElementById('outstandingInvoices').textContent = outstandingInvoices;
+        }
+        
+        // Update stats on page load
+        document.addEventListener('DOMContentLoaded', updateDashboardStats);
+        
+        // Update stats every 30 seconds
+        setInterval(updateDashboardStats, 30000);
+    </script>
+<script src="unified_data_manager.js"></script>
+<script src="optimized_data_storage.js"></script>
+
+        <!-- Note: Email functionality is integrated into Communication Hub -->
+        
+<script>
+        // Update calendar card to point to live calendar
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarCards = document.querySelectorAll('.feature-card');
+            calendarCards.forEach(card => {
+                const heading = card.querySelector('h3');
+                if (heading && heading.textContent.includes('Calendar')) {
+                    card.onclick = () => window.location.href = 'oscar_calendar.html';
+                    const description = card.querySelector('p');
+                    if (description) {
+                        description.textContent = 'View live calendar with visits, bills, and invoices';
+                    }
+                }
+            });
+        });
+        </script>
+        
+        <!-- Data cleanup script - runs once to clear contaminated data -->
+        <script src="clear_contaminated_data.js"></script>
+</body>
+</html>

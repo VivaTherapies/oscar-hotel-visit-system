@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visit Scheduler - Oscar's Hotel Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .scheduler-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .scheduler-form {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .upcoming-visits {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .hotel-search {
+            position: relative;
+        }
+        
+        .hotel-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .hotel-suggestion {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .hotel-suggestion:hover {
+            background: #f8f9fa;
+        }
+        
+        .hotel-suggestion:last-child {
+            border-bottom: none;
+        }
+        
+        .schedule-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        .schedule-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .visit-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        
+        .visit-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .visit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .visit-hotel {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .visit-date {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .visit-details {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .visit-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .visit-action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-form {
+            background: #28a745;
+            color: white;
+        }
+        
+        .visit-action-btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+        
+        .no-visits {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .scheduler-container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+            
+            .upcoming-visits {
+                max-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📅 Visit Scheduler</h1>
+        <button class="back-button" onclick="window.location.href='index.html'">← Back to Dashboard</button>
+    </div>
+
+    <div class="scheduler-container">
+        <!-- Visit Scheduling Form -->
+        <div class="scheduler-form">
+            <h2>Schedule New Visit</h2>
+            <form id="visitSchedulerForm">
+                <div class="form-group">
+                    <label for="visitDate">Visit Date</label>
+                    <input type="date" id="visitDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="visitTime">Visit Time</label>
+                    <input type="time" id="visitTime" required>
+                </div>
+                
+                <div class="form-group hotel-search">
+                    <label for="hotelSearch">Hotel</label>
+                    <input type="text" id="hotelSearch" placeholder="Search for hotel..." required>
+                    <div id="hotelSuggestions" class="hotel-suggestions"></div>
+                    <input type="hidden" id="selectedHotelId">
+                </div>
+                
+                <div class="form-group">
+                    <label for="visitPurpose">Visit Purpose</label>
+                    <select id="visitPurpose" required>
+                        <option value="">Select Purpose</option>
+                        <option value="business_meeting">Business Meeting</option>
+                        <option value="client_visit">Client Visit</option>
+                        <option value="service_presentation">Service Presentation</option>
+                        <option value="contract_discussion">Contract Discussion</option>
+                        <option value="follow_up">Follow-up Meeting</option>
+                        <option value="partnership_review">Partnership Review</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactPerson">Contact Person</label>
+                    <input type="text" id="contactPerson" placeholder="Contact name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactEmail">Contact Email</label>
+                    <input type="email" id="contactEmail" placeholder="contact@hotel.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="duration">Duration (minutes)</label>
+                    <select id="duration">
+                        <option value="30">30 minutes</option>
+                        <option value="45">45 minutes</option>
+                        <option value="60" selected>60 minutes</option>
+                        <option value="90">90 minutes</option>
+                        <option value="120">120 minutes</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="visitNotes">Notes</label>
+                    <textarea id="visitNotes" rows="3" placeholder="Additional notes for this visit..."></textarea>
+                </div>
+                
+                <button type="submit" class="schedule-button">📅 Schedule Visit</button>
+            </form>
+        </div>
+        
+        <!-- Upcoming Visits -->
+        <div class="upcoming-visits">
+            <h2>📋 Upcoming Visits</h2>
+            <div id="upcomingVisitsList">
+                <div class="no-visits">No upcoming visits scheduled</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="unified_data_manager.js"></script>
+    <script>
+        /**
+         * Enhanced Hotel Search Functionality
+         * Implements 3-character consonant search for Oscar's Hotel Visit Management System
+         */
+        class EnhancedHotelSearch {
+            constructor() {
+                this.hotels = [];
+                this.consonants = 'BCDFGHJKLMNPQRSTVWXYZ';
+                this.vowels = 'AEIOU';
+                this.searchCache = new Map();
+            }
+
+            // Initialize with hotel data
+            initialize(hotels) {
+                this.hotels = hotels;
+                this.buildSearchIndex();
+                console.log(`Enhanced Hotel Search initialized with ${hotels.length} hotels`);
+            }
+
+            // Build search index for faster lookups
+            buildSearchIndex() {
+                this.hotels.forEach(hotel => {
+                    // Generate consonant codes for each hotel
+                    hotel.consonantCode = this.generateConsonantCode(hotel.name);
+                    hotel.searchTerms = this.generateSearchTerms(hotel);
+                });
+            }
+
+            // Generate 3-character consonant code from hotel name
+            generateConsonantCode(hotelName) {
+                const cleanName = hotelName.toUpperCase()
+                    .replace(/[^A-Z]/g, '') // Remove non-letters
+                    .replace(/THE|HOTEL|LONDON/g, ''); // Remove common words
+                
+                const consonants = cleanName.split('').filter(char => 
+                    this.consonants.includes(char)
+                );
+                
+                // Take first 3 consonants, pad with vowels if needed
+                let code = consonants.slice(0, 3).join('');
+                
+                if (code.length < 3) {
+                    const vowels = cleanName.split('').filter(char => 
+                        this.vowels.includes(char)
+                    );
+                    code += vowels.slice(0, 3 - code.length).join('');
+                }
+                
+                return code.padEnd(3, 'X'); // Pad with X if still short
+            }
+
+            // Generate all possible search terms for a hotel
+            generateSearchTerms(hotel) {
+                const terms = new Set();
+                
+                // Add full name
+                terms.add(hotel.name.toLowerCase());
+                
+                // Add area
+                terms.add(hotel.area.toLowerCase());
+                
+                // Add consonant code
+                terms.add(hotel.consonantCode.toLowerCase());
+                
+                // Add name words
+                hotel.name.split(/\s+/).forEach(word => {
+                    if (word.length > 2) {
+                        terms.add(word.toLowerCase());
+                    }
+                });
+                
+                return Array.from(terms);
+            }
+
+            // Main search function
+            search(query) {
+                if (!query || query.length < 1) {
+                    return [];
+                }
+
+                const searchQuery = query.toLowerCase().trim();
+                
+                // Check cache first
+                if (this.searchCache.has(searchQuery)) {
+                    return this.searchCache.get(searchQuery);
+                }
+
+                let results = [];
+
+                if (searchQuery.length === 3) {
+                    // 3-character search - prioritize consonant code matching
+                    results = this.searchByConsonantCode(searchQuery);
+                } else {
+                    // Regular search
+                    results = this.searchByTerms(searchQuery);
+                }
+
+                // Sort results by relevance
+                results = this.sortByRelevance(results, searchQuery);
+
+                // Cache results
+                this.searchCache.set(searchQuery, results);
+
+                return results.slice(0, 10); // Return top 10 results
+            }
+
+            // Search by 3-character consonant code
+            searchByConsonantCode(query) {
+                const queryUpper = query.toUpperCase();
+                const results = [];
+
+                this.hotels.forEach(hotel => {
+                    let score = 0;
+
+                    // Exact consonant code match
+                    if (hotel.consonantCode === queryUpper) {
+                        score += 100;
+                    }
+                    // Partial consonant code match
+                    else if (hotel.consonantCode.includes(queryUpper)) {
+                        score += 80;
+                    }
+                    // Check if query matches start of consonant code
+                    else if (hotel.consonantCode.startsWith(queryUpper)) {
+                        score += 90;
+                    }
+
+                    // Also check regular name matching for 3-char queries
+                    if (hotel.name.toLowerCase().includes(query.toLowerCase())) {
+                        score += 60;
+                    }
+
+                    // Check area matching
+                    if (hotel.area.toLowerCase().includes(query.toLowerCase())) {
+                        score += 40;
+                    }
+
+                    if (score > 0) {
+                        results.push({ hotel, score });
+                    }
+                });
+
+                return results;
+            }
+
+            // Search by general terms
+            searchByTerms(query) {
+                const results = [];
+
+                this.hotels.forEach(hotel => {
+                    let score = 0;
+
+                    // Check each search term
+                    hotel.searchTerms.forEach(term => {
+                        if (term.includes(query)) {
+                            if (term.startsWith(query)) {
+                                score += 50; // Higher score for prefix match
+                            } else {
+                                score += 30; // Lower score for substring match
+                            }
+                        }
+                    });
+
+                    // Exact name match
+                    if (hotel.name.toLowerCase() === query) {
+                        score += 100;
+                    }
+                    // Name starts with query
+                    else if (hotel.name.toLowerCase().startsWith(query)) {
+                        score += 80;
+                    }
+                    // Name contains query
+                    else if (hotel.name.toLowerCase().includes(query)) {
+                        score += 60;
+                    }
+
+                    // Area matching
+                    if (hotel.area.toLowerCase().includes(query)) {
+                        score += 40;
+                    }
+
+                    // Priority boost
+                    if (hotel.priority === 'P1') {
+                        score += 10;
+                    }
+
+                    if (score > 0) {
+                        results.push({ hotel, score });
+                    }
+                });
+
+                return results;
+            }
+
+            // Sort results by relevance score
+            sortByRelevance(results, query) {
+                return results
+                    .sort((a, b) => {
+                        // First sort by score
+                        if (b.score !== a.score) {
+                            return b.score - a.score;
+                        }
+                        
+                        // Then by priority
+                        const priorityOrder = { 'P1': 3, 'P2': 2, 'P3': 1 };
+                        const aPriority = priorityOrder[a.hotel.priority] || 0;
+                        const bPriority = priorityOrder[b.hotel.priority] || 0;
+                        
+                        if (bPriority !== aPriority) {
+                            return bPriority - aPriority;
+                        }
+                        
+                        // Finally by name alphabetically
+                        return a.hotel.name.localeCompare(b.hotel.name);
+                    })
+                    .map(result => result.hotel);
+            }
+
+            // Get hotel suggestions for autocomplete
+            getSuggestions(query, limit = 5) {
+                const results = this.search(query);
+                return results.slice(0, limit);
+            }
+        }
+
+        let hotels = [];
+        let visits = [];
+        let hotelSearch = new EnhancedHotelSearch();
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHotels();
+            loadVisits();
+            displayUpcomingVisits();
+            
+            // Set default date to today
+            document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+            
+            // Set default time to current time + 1 hour
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+            document.getElementById('visitTime').value = now.toTimeString().slice(0, 5);
+        });
+        
+        // Load hotels from database file
+        async function loadHotels() {
+            try {
+                // First try to load from the actual database file
+                const response = await fetch('hotels_database.json');
+                if (response.ok) {
+                    const hotelsData = await response.json();
+                    if (Array.isArray(hotelsData) && hotelsData.length > 0) {
+                        // Process hotels to add search functionality
+                        hotels = hotelsData.map(hotel => ({
+                            ...hotel,
+                            id: hotel.name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+                            searchTerms: [
+                                hotel.name.toLowerCase(),
+                                hotel.area.toLowerCase(),
+                                hotel.type.toLowerCase()
+                            ],
+                            consonantCode: extractConsonants(hotel.name)
+                        }));
+                        
+                        // Store in localStorage for faster subsequent loads
+                        localStorage.setItem('oscar_hotels', JSON.stringify(hotels));
+                        
+                        hotelSearch.initialize(hotels);
+                        console.log(`Loaded ${hotels.length} hotels from database file`);
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading hotels from database file:', error);
+            }
+            
+            // Fallback: Try multiple storage keys for compatibility
+            const hotelSources = [
+                'oscar_hotels',
+                'hotelDatabase', 
+                'hotels'
+            ];
+            
+            for (const key of hotelSources) {
+                const stored = localStorage.getItem(key);
+                if (stored) {
+                    try {
+                        const parsed = JSON.parse(stored);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            hotels = parsed;
+                            break;
+                        }
+                    } catch (e) {
+                        console.error(`Error parsing ${key}:`, e);
+                    }
+                }
+            }
+            
+            // Initialize unified data manager if no hotels found
+            if (hotels.length === 0 && window.UnifiedDataManager) {
+                UnifiedDataManager.initialize();
+                hotels = UnifiedDataManager.getHotels();
+            }
+            
+            // Initialize enhanced search
+            hotelSearch.initialize(hotels);
+            console.log(`Loaded ${hotels.length} hotels with enhanced search`);
+        }
+        
+        // Extract consonants from hotel name for 3-character search
+        function extractConsonants(name) {
+            return name.toUpperCase()
+                .replace(/[AEIOU\s\-'.,]/g, '')
+                .substring(0, 3);
+        }
+        
+        // Load visits from storage with deduplication
+        function loadVisits() {
+            // Primary storage key
+            const stored = localStorage.getItem('oscar_visits');
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed)) {
+                        // Remove duplicates based on ID
+                        const uniqueVisits = [];
+                        const seenIds = new Set();
+                        
+                        parsed.forEach(visit => {
+                            if (!seenIds.has(visit.id)) {
+                                seenIds.add(visit.id);
+                                uniqueVisits.push(visit);
+                            }
+                        });
+                        
+                        visits = uniqueVisits;
+                        
+                        // Save back the deduplicated array
+                        localStorage.setItem('oscar_visits', JSON.stringify(visits));
+                        localStorage.setItem('visits', JSON.stringify(visits));
+                    }
+                } catch (e) {
+                    console.error('Error parsing visits:', e);
+                    visits = [];
+                }
+            } else {
+                visits = [];
+            }
+            
+            console.log(`Loaded ${visits.length} unique visits`);
+        }
+        
+        // Enhanced hotel search functionality
+        document.getElementById('hotelSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.trim();
+            const suggestions = document.getElementById('hotelSuggestions');
+            
+            if (searchTerm.length < 1) {
+                suggestions.style.display = 'none';
+                return;
+            }
+            
+            // Use enhanced search
+            const searchResults = hotelSearch.getSuggestions(searchTerm, 8);
+            
+            if (searchResults.length > 0) {
+                suggestions.innerHTML = searchResults.map(hotel => `
+                    <div class="hotel-suggestion" onclick="selectHotel('${hotel.id}', '${hotel.name.replace(/'/g, "\\'")}')">
+                        <strong>${hotel.name}</strong>
+                        ${hotel.consonantCode ? `<span style="color: #667eea; font-weight: bold; float: right;">${hotel.consonantCode}</span>` : ''}
+                        <br>
+                        <small>${hotel.area} • ${hotel.type || 'Hotel'} • Priority: ${hotel.priority || 'P1'}</small>
+                    </div>
+                `).join('');
+                suggestions.style.display = 'block';
+            } else {
+                suggestions.innerHTML = '<div class="hotel-suggestion" style="color: #999; font-style: italic;">No hotels found. Try 3-character search (e.g., CLR for Claridge\'s)</div>';
+                suggestions.style.display = 'block';
+            }
+        });
+        
+        // Select hotel from suggestions
+        function selectHotel(hotelId, hotelName) {
+            document.getElementById('hotelSearch').value = hotelName;
+            document.getElementById('selectedHotelId').value = hotelId;
+            document.getElementById('hotelSuggestions').style.display = 'none';
+            
+            // Auto-fill contact info if available
+            const hotel = hotels.find(h => h.id === hotelId);
+            if (hotel) {
+                if (hotel.email) document.getElementById('contactEmail').value = hotel.email;
+            }
+        }
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.hotel-search')) {
+                document.getElementById('hotelSuggestions').style.display = 'none';
+            }
+        });
+        
+        // Form submission with enhanced data persistence
+        document.getElementById('visitSchedulerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: 'visit_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                date: document.getElementById('visitDate').value,
+                time: document.getElementById('visitTime').value,
+                hotelId: document.getElementById('selectedHotelId').value,
+                hotelName: document.getElementById('hotelSearch').value,
+                purpose: document.getElementById('visitPurpose').value,
+                contactPerson: document.getElementById('contactPerson').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                duration: parseInt(document.getElementById('duration').value),
+                notes: document.getElementById('visitNotes').value,
+                status: 'scheduled',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            // Enhanced validation
+            if (!formData.hotelId) {
+                showNotification('Please select a hotel from the suggestions', 'error');
+                return;
+            }
+            
+            if (!formData.date || !formData.time) {
+                showNotification('Please select both date and time for the visit', 'error');
+                return;
+            }
+            
+            if (!formData.purpose) {
+                showNotification('Please select a visit purpose', 'error');
+                return;
+            }
+            
+            // Check for duplicate visits (same hotel, same date/time)
+            const existingVisit = visits.find(v => 
+                v.hotelId === formData.hotelId && 
+                v.date === formData.date && 
+                v.time === formData.time &&
+                v.status === 'scheduled'
+            );
+            
+            if (existingVisit) {
+                if (!confirm('A visit to this hotel is already scheduled for this date and time. Do you want to create another one?')) {
+                    return;
+                }
+            }
+            
+            try {
+                // Add to visits array
+                visits.push(formData);
+                
+                // Save to multiple storage locations for redundancy
+                localStorage.setItem('visits', JSON.stringify(visits));
+                localStorage.setItem('oscar_visits', JSON.stringify(visits));
+                
+                // Save to unified data manager
+                if (window.UnifiedDataManager) {
+                    const visitId = UnifiedDataManager.scheduleVisit(formData);
+                    if (visitId) {
+                        formData.unifiedId = visitId;
+                    }
+                }
+                
+                // Update scheduled visits format
+                const scheduledVisits = JSON.parse(localStorage.getItem('scheduledVisits') || '{}');
+                if (!scheduledVisits[formData.date]) {
+                    scheduledVisits[formData.date] = [];
+                }
+                scheduledVisits[formData.date].push(formData);
+                localStorage.setItem('scheduledVisits', JSON.stringify(scheduledVisits));
+                
+                // Update calendar with visit
+                updateCalendarWithVisit(formData);
+                
+                // Update visit history for tracking
+                const visitHistory = JSON.parse(localStorage.getItem('visitHistory') || '[]');
+                visitHistory.push({
+                    ...formData,
+                    action: 'scheduled',
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('visitHistory', JSON.stringify(visitHistory));
+                
+                // Show success message with details
+                showNotification(`Visit scheduled successfully for ${formData.hotelName} on ${formatDate(formData.date)} at ${formData.time}`, 'success');
+                
+                // Reset form
+                this.reset();
+                document.getElementById('selectedHotelId').value = '';
+                
+                // Set default date and time again
+                document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+                const now = new Date();
+                now.setHours(now.getHours() + 1);
+                document.getElementById('visitTime').value = now.toTimeString().slice(0, 5);
+                
+                // Refresh upcoming visits display
+                displayUpcomingVisits();
+                
+                // Update dashboard statistics
+                updateDashboardStats();
+                
+                console.log('Visit scheduled successfully:', formData);
+                
+            } catch (error) {
+                console.error('Error scheduling visit:', error);
+                showNotification('Error scheduling visit. Please try again.', 'error');
+                
+                // Remove from visits array if there was an error
+                visits = visits.filter(v => v.id !== formData.id);
+            }
+        });
+        
+        // Display upcoming visits with enhanced data handling
+        function displayUpcomingVisits() {
+            const container = document.getElementById('upcomingVisitsList');
+            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            
+            // Use existing visits array (already loaded and deduplicated)
+            
+            // Filter and sort upcoming visits
+            const upcomingVisits = visits
+                .filter(visit => {
+                    // Only show scheduled visits that are today or in the future
+                    if (visit.status !== 'scheduled') return false;
+                    if (visit.date < today) return false;
+                    
+                    // If it's today, check if the time hasn't passed
+                    if (visit.date === today) {
+                        const visitDateTime = new Date(`${visit.date}T${visit.time}`);
+                        return visitDateTime > now;
+                    }
+                    
+                    return true;
+                })
+                .sort((a, b) => {
+                    const dateA = new Date(a.date + 'T' + a.time);
+                    const dateB = new Date(b.date + 'T' + b.time);
+                    return dateA - dateB;
+                });
+            
+            if (upcomingVisits.length === 0) {
+                container.innerHTML = `
+                    <div class="no-visits">
+                        <p>No upcoming visits scheduled</p>
+                        <small>Schedule a new visit using the form on the left</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = upcomingVisits.map(visit => {
+                const visitDateTime = new Date(`${visit.date}T${visit.time}`);
+                const isToday = visit.date === today;
+                const timeUntilVisit = visitDateTime - now;
+                const hoursUntil = Math.floor(timeUntilVisit / (1000 * 60 * 60));
+                const minutesUntil = Math.floor((timeUntilVisit % (1000 * 60 * 60)) / (1000 * 60));
+                
+                let timeIndicator = '';
+                if (isToday && timeUntilVisit > 0) {
+                    if (hoursUntil > 0) {
+                        timeIndicator = `<span style="color: #ff6b35; font-weight: bold;">In ${hoursUntil}h ${minutesUntil}m</span>`;
+                    } else if (minutesUntil > 0) {
+                        timeIndicator = `<span style="color: #ff6b35; font-weight: bold;">In ${minutesUntil} minutes</span>`;
+                    }
+                }
+                
+                return `
+                    <div class="visit-item" data-visit-id="${visit.id}">
+                        <div class="visit-header">
+                            <div class="visit-hotel">${visit.hotelName}</div>
+                            <div class="visit-date">
+                                ${formatDate(visit.date)} ${visit.time}
+                                ${timeIndicator}
+                            </div>
+                        </div>
+                        <div class="visit-details">
+                            <strong>Purpose:</strong> ${formatPurpose(visit.purpose)}<br>
+                            <strong>Duration:</strong> ${visit.duration} minutes<br>
+                            ${visit.contactPerson ? `<strong>Contact:</strong> ${visit.contactPerson}<br>` : ''}
+                            ${visit.contactEmail ? `<strong>Email:</strong> ${visit.contactEmail}<br>` : ''}
+                            ${visit.notes ? `<strong>Notes:</strong> ${visit.notes}` : ''}
+                        </div>
+                        <div class="visit-actions">
+                            <button class="visit-action-btn btn-form" onclick="openVisitForm('${visit.id}')" title="Open visit form">
+                                📋 Open Form
+                            </button>
+                            <button class="visit-action-btn btn-edit" onclick="editVisit('${visit.id}')" title="Edit visit details">
+                                ✏️ Edit
+                            </button>
+                            <button class="visit-action-btn btn-delete" onclick="deleteVisit('${visit.id}')" title="Delete visit">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Update the header with count
+            const headerElement = document.querySelector('.upcoming-visits h2');
+            if (headerElement) {
+                headerElement.textContent = `📋 Upcoming Visits (${upcomingVisits.length})`;
+            }
+        }
+        
+        // Update dashboard statistics
+        function updateDashboardStats() {
+            // This function can be called to update main dashboard
+            // Send message to parent window if in iframe, or update local stats
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'updateStats',
+                        data: {
+                            scheduledVisits: visits.filter(v => v.status === 'scheduled').length,
+                            completedVisits: visits.filter(v => v.status === 'completed').length
+                        }
+                    }, '*');
+                }
+            } catch (e) {
+                console.log('Could not update parent dashboard stats');
+            }
+        }
+        
+        // Format date for display
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-GB', { 
+                weekday: 'short', 
+                day: 'numeric', 
+                month: 'short' 
+            });
+        }
+        
+        // Format purpose for display
+        function formatPurpose(purpose) {
+            const purposes = {
+                'business_meeting': 'Business Meeting',
+                'client_visit': 'Client Visit',
+                'service_presentation': 'Service Presentation',
+                'contract_discussion': 'Contract Discussion',
+                'follow_up': 'Follow-up Meeting',
+                'partnership_review': 'Partnership Review'
+            };
+            return purposes[purpose] || purpose;
+        }
+        
+        // Open visit form
+        function openVisitForm(visitId) {
+            const visit = visits.find(v => v.id === visitId);
+            if (!visit) return;
+            
+            // Store visit data for form
+            localStorage.setItem('currentVisit', JSON.stringify(visit));
+            
+            // Determine which form to open based on hotel
+            const hotelName = visit.hotelName.toLowerCase();
+            let formUrl = 'forms/generic_form.html';
+            
+            if (hotelName.includes('claridge')) {
+                formUrl = 'forms/claridges_form.html';
+            } else if (hotelName.includes('ritz')) {
+                formUrl = 'forms/ritz_form.html';
+            } else if (hotelName.includes('dorchester')) {
+                formUrl = 'forms/dorchester_form.html';
+            } else if (hotelName.includes('savoy')) {
+                formUrl = 'forms/savoy_form.html';
+            }
+            
+            // Store return URL
+            localStorage.setItem('returnUrl', window.location.href);
+            
+            // Navigate to form
+            window.location.href = formUrl;
+        }
+        
+        // Edit visit with enhanced data handling
+        function editVisit(visitId) {
+            const visit = visits.find(v => v.id === visitId);
+            if (!visit) {
+                showNotification('Visit not found', 'error');
+                return;
+            }
+            
+            // Populate form with visit data
+            document.getElementById('visitDate').value = visit.date;
+            document.getElementById('visitTime').value = visit.time;
+            document.getElementById('hotelSearch').value = visit.hotelName;
+            document.getElementById('selectedHotelId').value = visit.hotelId;
+            document.getElementById('visitPurpose').value = visit.purpose;
+            document.getElementById('contactPerson').value = visit.contactPerson || '';
+            document.getElementById('contactEmail').value = visit.contactEmail || '';
+            document.getElementById('duration').value = visit.duration;
+            document.getElementById('visitNotes').value = visit.notes || '';
+            
+            // Remove the visit from all storage locations (will be re-added when form is submitted)
+            visits = visits.filter(v => v.id !== visitId);
+            localStorage.setItem('visits', JSON.stringify(visits));
+            localStorage.setItem('oscar_visits', JSON.stringify(visits));
+            
+            // Remove from scheduled visits format
+            const scheduledVisits = JSON.parse(localStorage.getItem('scheduledVisits') || '{}');
+            if (scheduledVisits[visit.date]) {
+                scheduledVisits[visit.date] = scheduledVisits[visit.date].filter(v => v.id !== visitId);
+                if (scheduledVisits[visit.date].length === 0) {
+                    delete scheduledVisits[visit.date];
+                }
+                localStorage.setItem('scheduledVisits', JSON.stringify(scheduledVisits));
+            }
+            
+            // Remove from unified data manager
+            if (window.UnifiedDataManager) {
+                UnifiedDataManager.deleteVisit(visitId);
+            }
+            
+            // Add to visit history
+            const visitHistory = JSON.parse(localStorage.getItem('visitHistory') || '[]');
+            visitHistory.push({
+                ...visit,
+                action: 'edited',
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('visitHistory', JSON.stringify(visitHistory));
+            
+            // Refresh display
+            displayUpcomingVisits();
+            
+            showNotification('Visit loaded for editing. Make changes and submit to save.', 'info');
+            
+            // Scroll to form
+            document.getElementById('visitSchedulerForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Delete visit with enhanced data cleanup
+        function deleteVisit(visitId) {
+            const visit = visits.find(v => v.id === visitId);
+            if (!visit) {
+                showNotification('Visit not found', 'error');
+                return;
+            }
+            
+            const confirmMessage = `Are you sure you want to delete the visit to ${visit.hotelName} on ${formatDate(visit.date)} at ${visit.time}?`;
+            
+            if (confirm(confirmMessage)) {
+                try {
+                    // Remove from all storage locations
+                    visits = visits.filter(v => v.id !== visitId);
+                    localStorage.setItem('visits', JSON.stringify(visits));
+                    localStorage.setItem('oscar_visits', JSON.stringify(visits));
+                    
+                    // Remove from scheduled visits format
+                    const scheduledVisits = JSON.parse(localStorage.getItem('scheduledVisits') || '{}');
+                    if (scheduledVisits[visit.date]) {
+                        scheduledVisits[visit.date] = scheduledVisits[visit.date].filter(v => v.id !== visitId);
+                        if (scheduledVisits[visit.date].length === 0) {
+                            delete scheduledVisits[visit.date];
+                        }
+                        localStorage.setItem('scheduledVisits', JSON.stringify(scheduledVisits));
+                    }
+                    
+                    // Remove from calendar visits
+                    const calendarVisits = JSON.parse(localStorage.getItem('calendarVisits') || '[]');
+                    const updatedCalendarVisits = calendarVisits.filter(v => v.id !== visitId);
+                    localStorage.setItem('calendarVisits', JSON.stringify(updatedCalendarVisits));
+                    
+                    // Remove from unified data manager
+                    if (window.UnifiedDataManager) {
+                        UnifiedDataManager.deleteVisit(visitId);
+                    }
+                    
+                    // Add to visit history
+                    const visitHistory = JSON.parse(localStorage.getItem('visitHistory') || '[]');
+                    visitHistory.push({
+                        ...visit,
+                        action: 'deleted',
+                        timestamp: new Date().toISOString()
+                    });
+                    localStorage.setItem('visitHistory', JSON.stringify(visitHistory));
+                    
+                    // Refresh display
+                    displayUpcomingVisits();
+                    updateDashboardStats();
+                    
+                    showNotification(`Visit to ${visit.hotelName} deleted successfully`, 'success');
+                    
+                } catch (error) {
+                    console.error('Error deleting visit:', error);
+                    showNotification('Error deleting visit. Please try again.', 'error');
+                }
+            }
+        }
+        
+        // Update calendar with new visit (fixed date handling)
+        function updateCalendarWithVisit(visit) {
+            // Add to calendar data with proper date handling
+            const calendarVisits = JSON.parse(localStorage.getItem('calendarVisits') || '[]');
+            
+            // Ensure date is in correct format (YYYY-MM-DD) without timezone issues
+            const visitDate = new Date(visit.date + 'T00:00:00');
+            const formattedDate = visitDate.getFullYear() + '-' + 
+                String(visitDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(visitDate.getDate()).padStart(2, '0');
+            
+            calendarVisits.push({
+                date: formattedDate, // Use properly formatted date
+                hotel: visit.hotelName,
+                time: visit.time,
+                duration: visit.duration,
+                purpose: visit.purpose,
+                status: 'scheduled',
+                id: visit.id,
+                originalDate: visit.date // Keep original for reference
+            });
+            localStorage.setItem('calendarVisits', JSON.stringify(calendarVisits));
+            
+            console.log('Calendar updated with visit:', {
+                originalDate: visit.date,
+                formattedDate: formattedDate,
+                hotel: visit.hotelName
+            });
+        }
+        
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideInRight 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+    
+    <style>
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</body>
+</html>

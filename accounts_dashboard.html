@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounts Dashboard - Oscar's System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background: #218838;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .file-upload {
+            border: 2px dashed #667eea;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload:hover {
+            background: #f8f9ff;
+            border-color: #5a6fd8;
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .records-section {
+            grid-column: 1 / -1;
+        }
+        
+        .records-tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+            font-weight: 600;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .records-table th,
+        .records-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .records-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .records-table tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.collected {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.delivered {
+            background: #cce7ff;
+            color: #004085;
+        }
+        
+        .hotel-filter {
+            margin-bottom: 20px;
+        }
+        
+        .hotel-filter select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .file-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .file-preview img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .records-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .records-table {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← Back to Dashboard</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📊 Accounts Dashboard</h1>
+            <p>Invoice Collection & Hotel Delivery Management</p>
+        </div>
+        
+        <div class="dashboard-grid">
+            <!-- Invoice Collection Section -->
+            <div class="section">
+                <h2>📄 Invoice Collection</h2>
+                <form id="invoiceForm">
+                    <div class="form-group">
+                        <label for="invoiceNumber">Invoice Number *</label>
+                        <input type="text" id="invoiceNumber" required placeholder="INV-2025-001">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="invoiceDate">Invoice Date *</label>
+                        <input type="date" id="invoiceDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="invoiceDescription">Description *</label>
+                        <textarea id="invoiceDescription" rows="3" required placeholder="Service description..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="collectionDate">Collection Date *</label>
+                        <input type="date" id="collectionDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="collectionTime">Collection Time *</label>
+                        <input type="time" id="collectionTime" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="invoiceHotel">Hotel *</label>
+                        <select id="invoiceHotel" required>
+                            <option value="">Select Hotel</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Upload Invoice Document</label>
+                        <div class="file-upload" onclick="document.getElementById('invoiceFile').click()">
+                            <p>📎 Click to upload invoice file</p>
+                            <input type="file" id="invoiceFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        </div>
+                        <div id="invoiceFilePreview" class="file-preview"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">📄 Create Invoice Collection</button>
+                </form>
+            </div>
+            
+            <!-- Hotel Delivery Section -->
+            <div class="section">
+                <h2>🏨 Hotel Delivery</h2>
+                <form id="deliveryForm">
+                    <div class="form-group">
+                        <label for="deliveryNumber">Delivery Number *</label>
+                        <input type="text" id="deliveryNumber" required placeholder="DEL-2025-001">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deliveryDate">Delivery Date *</label>
+                        <input type="date" id="deliveryDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deliveryDescription">Description *</label>
+                        <textarea id="deliveryDescription" rows="3" required placeholder="Items to deliver..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deliveryDateTime">Delivery Date & Time *</label>
+                        <input type="datetime-local" id="deliveryDateTime" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deliveryHotel">Hotel *</label>
+                        <select id="deliveryHotel" required>
+                            <option value="">Select Hotel</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Upload Hotel Communication</label>
+                        <div class="file-upload" onclick="document.getElementById('deliveryFile').click()">
+                            <p>📎 Click to upload communication file</p>
+                            <input type="file" id="deliveryFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        </div>
+                        <div id="deliveryFilePreview" class="file-preview"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">🚚 Create Hotel Delivery</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Records Management Section -->
+        <div class="section records-section">
+            <h2>📋 Records Management</h2>
+            
+            <div class="hotel-filter">
+                <label for="hotelFilter">Filter by Hotel:</label>
+                <select id="hotelFilter">
+                    <option value="">All Hotels</option>
+                </select>
+            </div>
+            
+            <div class="records-tabs">
+                <button class="tab active" onclick="showTab('invoices')">📄 Invoice Collections</button>
+                <button class="tab" onclick="showTab('deliveries')">🚚 Hotel Deliveries</button>
+            </div>
+            
+            <div id="invoicesTab" class="tab-content">
+                <table class="records-table">
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Hotel</th>
+                            <th>Description</th>
+                            <th>Collection Date</th>
+                            <th>Status</th>
+                            <th>File</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoicesTableBody">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="deliveriesTab" class="tab-content" style="display: none;">
+                <table class="records-table">
+                    <thead>
+                        <tr>
+                            <th>Delivery #</th>
+                            <th>Hotel</th>
+                            <th>Description</th>
+                            <th>Delivery Date</th>
+                            <th>Status</th>
+                            <th>File</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deliveriesTableBody">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize system
+        let invoices = JSON.parse(localStorage.getItem('invoiceCollections') || '[]');
+        let deliveries = JSON.parse(localStorage.getItem('hotelDeliveries') || '[]');
+        let hotels = [];
+        
+                async function loadHotels() {
+            try {
+                const response = await fetch('hotels_database.json');
+                const data = await response.json();
+                hotels = data;
+                populateHotelDropdowns();
+            } catch (error) {
+               console.error(\'Error loading hotels:\', error);
+                console.log(\'Loaded all hotels from database\');
+                populateHotelDropdowns();
+            }
+        }
+        
+        function populateHotelDropdowns() {
+            const invoiceHotel = document.getElementById('invoiceHotel');
+            const deliveryHotel = document.getElementById('deliveryHotel');
+            const hotelFilter = document.getElementById('hotelFilter');
+            
+            hotels.forEach(hotel => {
+                const option1 = new Option(hotel.name, hotel.name);
+                const option2 = new Option(hotel.name, hotel.name);
+                const option3 = new Option(hotel.name, hotel.name);
+                
+                invoiceHotel.appendChild(option1);
+                deliveryHotel.appendChild(option2);
+                hotelFilter.appendChild(option3);
+            });
+        }
+        
+        // File upload handlers
+        document.getElementById('invoiceFile').addEventListener('change', function(e) {
+            handleFileUpload(e, 'invoiceFilePreview');
+        });
+        
+        document.getElementById('deliveryFile').addEventListener('change', function(e) {
+            handleFileUpload(e, 'deliveryFilePreview');
+        });
+        
+        function handleFileUpload(event, previewId) {
+            const file = event.target.files[0];
+            const preview = document.getElementById(previewId);
+            
+            if (file) {
+                preview.style.display = 'block';
+                preview.innerHTML = `
+                    <p><strong>File:</strong> ${file.name}</p>
+                    <p><strong>Size:</strong> ${(file.size / 1024).toFixed(1)} KB</p>
+                    <p><strong>Type:</strong> ${file.type}</p>
+                `;
+                
+                // Store file reference
+                const fileData = {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    lastModified: file.lastModified
+                };
+                
+                if (previewId === 'invoiceFilePreview') {
+                    document.getElementById('invoiceForm').dataset.file = JSON.stringify(fileData);
+                } else {
+                    document.getElementById('deliveryForm').dataset.file = JSON.stringify(fileData);
+                }
+            }
+        }
+        
+        // Form submissions
+        document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            createInvoiceCollection();
+        });
+        
+        document.getElementById('deliveryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            createHotelDelivery();
+        });
+        
+        function createInvoiceCollection() {
+            const formData = {
+                id: 'INV_' + Date.now(),
+                number: document.getElementById('invoiceNumber').value,
+                date: document.getElementById('invoiceDate').value,
+                description: document.getElementById('invoiceDescription').value,
+                collectionDate: document.getElementById('collectionDate').value,
+                collectionTime: document.getElementById('collectionTime').value,
+                hotel: document.getElementById('invoiceHotel').value,
+                status: 'pending',
+                file: document.getElementById('invoiceForm').dataset.file || null,
+                createdAt: new Date().toISOString(),
+                createdBy: 'Office Team'
+            };
+            
+            invoices.push(formData);
+            localStorage.setItem('invoiceCollections', JSON.stringify(invoices));
+            
+            // Add to Oscar's calendar
+            addToOscarCalendar({
+                type: 'invoice_collection',
+                title: `Invoice Collection: ${formData.number}`,
+                hotel: formData.hotel,
+                date: formData.collectionDate,
+                time: formData.collectionTime,
+                description: formData.description,
+                id: formData.id
+            });
+            
+            showNotification('Invoice collection created and added to Oscar\\'s calendar!', 'success');
+            document.getElementById('invoiceForm').reset();
+            document.getElementById('invoiceFilePreview').style.display = 'none';
+            refreshTables();
+        }
+        
+        function createHotelDelivery() {
+            const deliveryDateTime = new Date(document.getElementById('deliveryDateTime').value);
+            
+            const formData = {
+                id: 'DEL_' + Date.now(),
+                number: document.getElementById('deliveryNumber').value,
+                date: document.getElementById('deliveryDate').value,
+                description: document.getElementById('deliveryDescription').value,
+                deliveryDate: deliveryDateTime.toISOString().split('T')[0],
+                deliveryTime: deliveryDateTime.toTimeString().split(' ')[0].substring(0, 5),
+                hotel: document.getElementById('deliveryHotel').value,
+                status: 'pending',
+                file: document.getElementById('deliveryForm').dataset.file || null,
+                createdAt: new Date().toISOString(),
+                createdBy: 'Office Team'
+            };
+            
+            deliveries.push(formData);
+            localStorage.setItem('hotelDeliveries', JSON.stringify(deliveries));
+            
+            // Add to Oscar's calendar
+            addToOscarCalendar({
+                type: 'hotel_delivery',
+                title: `Hotel Delivery: ${formData.number}`,
+                hotel: formData.hotel,
+                date: formData.deliveryDate,
+                time: formData.deliveryTime,
+                description: formData.description,
+                id: formData.id
+            });
+            
+            showNotification('Hotel delivery created and added to Oscar\\'s calendar!', 'success');
+            document.getElementById('deliveryForm').reset();
+            document.getElementById('deliveryFilePreview').style.display = 'none';
+            refreshTables();
+        }
+        
+        function addToOscarCalendar(item) {
+            // Add to calendar visits
+            const calendarVisits = JSON.parse(localStorage.getItem('calendarVisits') || '[]');
+            calendarVisits.push({
+                date: item.date,
+                hotel: item.hotel,
+                time: item.time,
+                title: item.title,
+                description: item.description,
+                type: item.type,
+                status: 'scheduled',
+                id: item.id
+            });
+            localStorage.setItem('calendarVisits', JSON.stringify(calendarVisits));
+            
+            // Add to Oscar's visits for unified tracking
+            const oscarVisits = JSON.parse(localStorage.getItem('oscar_visits') || '[]');
+            oscarVisits.push({
+                id: item.id,
+                hotelName: item.hotel,
+                date: item.date,
+                time: item.time,
+                purpose: item.type === 'invoice_collection' ? 'Invoice Collection' : 'Hotel Delivery',
+                description: item.description,
+                status: 'scheduled',
+                type: item.type
+            });
+            localStorage.setItem('oscar_visits', JSON.stringify(oscarVisits));
+        }
+        
+        function updateStatus(type, id, newStatus) {
+            if (type === 'invoice') {
+                const invoice = invoices.find(inv => inv.id === id);
+                if (invoice) {
+                    invoice.status = newStatus;
+                    invoice.updatedAt = new Date().toISOString();
+                    invoice.updatedBy = 'Oscar';
+                    localStorage.setItem('invoiceCollections', JSON.stringify(invoices));
+                }
+            } else {
+                const delivery = deliveries.find(del => del.id === id);
+                if (delivery) {
+                    delivery.status = newStatus;
+                    delivery.updatedAt = new Date().toISOString();
+                    delivery.updatedBy = 'Oscar';
+                    localStorage.setItem('hotelDeliveries', JSON.stringify(deliveries));
+                }
+            }
+            
+            showNotification(`Status updated to ${newStatus}!`, 'success');
+            refreshTables();
+        }
+        
+        function showTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide content
+            document.getElementById('invoicesTab').style.display = tabName === 'invoices' ? 'block' : 'none';
+            document.getElementById('deliveriesTab').style.display = tabName === 'deliveries' ? 'block' : 'none';
+        }
+        
+        function refreshTables() {
+            const hotelFilter = document.getElementById('hotelFilter').value;
+            
+            // Refresh invoices table
+            const invoicesBody = document.getElementById('invoicesTableBody');
+            const filteredInvoices = hotelFilter ? invoices.filter(inv => inv.hotel === hotelFilter) : invoices;
+            
+            invoicesBody.innerHTML = filteredInvoices.map(invoice => `
+                <tr>
+                    <td>${invoice.number}</td>
+                    <td>${invoice.hotel}</td>
+                    <td>${invoice.description}</td>
+                    <td>${invoice.collectionDate} ${invoice.collectionTime}</td>
+                    <td><span class="status ${invoice.status}">${invoice.status.toUpperCase()}</span></td>
+                    <td>${invoice.file ? '📎 File attached' : 'No file'}</td>
+                    <td>
+                        ${invoice.status === 'pending' ? `
+                            <button class="btn btn-success" onclick="updateStatus('invoice', '${invoice.id}', 'collected')">✅ Collected</button>
+                        ` : ''}
+                        <button class="btn btn-warning" onclick="viewDetails('invoice', '${invoice.id}')">👁️ View</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Refresh deliveries table
+            const deliveriesBody = document.getElementById('deliveriesTableBody');
+            const filteredDeliveries = hotelFilter ? deliveries.filter(del => del.hotel === hotelFilter) : deliveries;
+            
+            deliveriesBody.innerHTML = filteredDeliveries.map(delivery => `
+                <tr>
+                    <td>${delivery.number}</td>
+                    <td>${delivery.hotel}</td>
+                    <td>${delivery.description}</td>
+                    <td>${delivery.deliveryDate} ${delivery.deliveryTime}</td>
+                    <td><span class="status ${delivery.status}">${delivery.status.toUpperCase()}</span></td>
+                    <td>${delivery.file ? '📎 File attached' : 'No file'}</td>
+                    <td>
+                        ${delivery.status === 'pending' ? `
+                            <button class="btn btn-success" onclick="updateStatus('delivery', '${delivery.id}', 'delivered')">✅ Delivered</button>
+                        ` : ''}
+                        <button class="btn btn-warning" onclick="viewDetails('delivery', '${delivery.id}')">👁️ View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function viewDetails(type, id) {
+            const item = type === 'invoice' ? 
+                invoices.find(inv => inv.id === id) : 
+                deliveries.find(del => del.id === id);
+            
+            if (item) {
+                alert(`Details for ${item.number}:\\n\\nHotel: ${item.hotel}\\nDescription: ${item.description}\\nStatus: ${item.status}\\nCreated: ${new Date(item.createdAt).toLocaleString()}\\nCreated by: ${item.createdBy}`);
+            }
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Hotel filter
+        document.getElementById('hotelFilter').addEventListener('change', refreshTables);
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHotels();
+            refreshTables();
+            
+            // Set default dates
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('invoiceDate').value = today;
+            document.getElementById('deliveryDate').value = today;
+            document.getElementById('collectionDate').value = today;
+            
+            const now = new Date();
+            const timeString = now.toTimeString().split(' ')[0].substring(0, 5);
+            document.getElementById('collectionTime').value = timeString;
+            
+            const datetimeString = now.toISOString().slice(0, 16);
+            document.getElementById('deliveryDateTime').value = datetimeString;
+        });
+    </script>
+</body>
+</html>

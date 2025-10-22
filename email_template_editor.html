@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template Editor - Oscar's Hotel Strategy</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; padding: 20px; min-height: 100vh; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .editor-content { padding: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        textarea { min-height: 200px; font-family: monospace; }
+        .btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        .btn:hover { background: #5a6fd8; }
+        .btn-success { background: #28a745; }
+        .btn-warning { background: #ffc107; color: #000; }
+        .preview-section { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .template-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .template-card { background: #f8f9ff; border: 2px solid #e1e5ff; border-radius: 10px; padding: 15px; cursor: pointer; transition: all 0.3s ease; }
+        .template-card:hover { border-color: #667eea; background: #fff; }
+        .template-card.active { border-color: #667eea; background: #fff; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Email Template Editor</h1>
+            <p>Customize email templates for hotel communications</p>
+        </div>
+        
+        <div class="editor-content">
+            <h3>Select Template to Edit</h3>
+            <div class="template-list" id="templateList">
+                <div class="template-card" onclick="selectTemplate('successful_meeting')">
+                    <h4>✅ Successful Meeting</h4>
+                    <p>Service information follow-up</p>
+                </div>
+                <div class="template-card" onclick="selectTemplate('follow_up_required')">
+                    <h4>📋 Follow-up Required</h4>
+                    <p>Additional information needed</p>
+                </div>
+                <div class="template-card" onclick="selectTemplate('service_proposal')">
+                    <h4>💼 Service Proposal</h4>
+                    <p>Detailed service offering</p>
+                </div>
+                <div class="template-card" onclick="selectTemplate('thank_you')">
+                    <h4>🙏 Thank You</h4>
+                    <p>Meeting appreciation</p>
+                </div>
+                <div class="template-card" onclick="selectTemplate('reschedule')">
+                    <h4>📅 Reschedule</h4>
+                    <p>Meeting time change</p>
+                </div>
+            </div>
+            
+            <div id="editorSection" style="display: none;">
+                <div class="form-group">
+                    <label>Template Name</label>
+                    <input type="text" id="templateName" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Subject</label>
+                    <input type="text" id="emailSubject" placeholder="Enter email subject...">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Body</label>
+                    <textarea id="emailBody" placeholder="Enter email body... Use {contactName} and {hotelName} as placeholders."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <button onclick="saveTemplate()" class="btn btn-success">💾 Save Template</button>
+                    <button onclick="previewTemplate()" class="btn btn-warning">👁️ Preview</button>
+                    <button onclick="resetTemplate()" class="btn">🔄 Reset to Default</button>
+                </div>
+                
+                <div class="preview-section" id="previewSection" style="display: none;">
+                    <h4>📧 Email Preview</h4>
+                    <div id="previewContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentTemplate = null;
+        
+        const defaultTemplates = {
+            successful_meeting: {
+                name: "Successful Meeting - Service Information",
+                subject: "Thank you for the productive meeting - Viva Therapies Services",
+                body: `Dear {contactName},
+
+Thank you for taking the time to meet with me today at {hotelName}. It was a pleasure discussing how Viva Therapies can enhance your guests' wellness experience.
+
+As discussed, our premium therapy services include:
+• In-room massage and wellness treatments
+• Spa consultation and setup services  
+• Staff training for wellness programs
+• Customized guest wellness packages
+
+I will follow up with detailed service information and pricing within the next 2 business days.
+
+Thank you again for your time and consideration.
+
+Best regards,
+Oscar
+Viva Therapies
+Phone: +44 20 1234 5678
+Email: oscar@vivatherapies.com`
+            },
+            follow_up_required: {
+                name: "Follow-up Required - Additional Information",
+                subject: "Follow-up: Additional Information - Viva Therapies",
+                body: `Dear {contactName},
+
+Thank you for meeting with me at {hotelName}. As requested, I'm following up with additional information about our wellness services.
+
+Please find attached:
+• Detailed service brochure
+• Pricing structure
+• Client testimonials
+• Implementation timeline
+
+I would be happy to schedule another meeting to discuss any questions you may have.
+
+Best regards,
+Oscar
+Viva Therapies
+Phone: +44 20 1234 5678
+Email: oscar@vivatherapies.com`
+            },
+            service_proposal: {
+                name: "Service Proposal - Detailed Offering",
+                subject: "Wellness Service Proposal - {hotelName}",
+                body: `Dear {contactName},
+
+Following our meeting, I'm pleased to present a customized wellness service proposal for {hotelName}.
+
+Our proposed services include:
+• Premium in-room treatments
+• Spa facility consultation
+• Guest wellness programs
+• Staff training and certification
+
+This proposal is tailored specifically to enhance your guests' experience and increase revenue through premium wellness offerings.
+
+I look forward to discussing this opportunity further.
+
+Best regards,
+Oscar
+Viva Therapies
+Phone: +44 20 1234 5678
+Email: oscar@vivatherapies.com`
+            },
+            thank_you: {
+                name: "Thank You - Meeting Appreciation",
+                subject: "Thank you for your time - Viva Therapies",
+                body: `Dear {contactName},
+
+Thank you for taking the time to meet with me at {hotelName} today.
+
+I appreciate your interest in our wellness services and look forward to the possibility of working together to enhance your guests' experience.
+
+Please don't hesitate to contact me if you have any questions.
+
+Best regards,
+Oscar
+Viva Therapies
+Phone: +44 20 1234 5678
+Email: oscar@vivatherapies.com`
+            },
+            reschedule: {
+                name: "Reschedule Request - New Meeting Time",
+                subject: "Meeting Reschedule Request - Viva Therapies",
+                body: `Dear {contactName},
+
+I hope this message finds you well. I need to reschedule our upcoming meeting at {hotelName}.
+
+Could we arrange a new time that works better for both of us? I'm available:
+• [Please suggest alternative times]
+
+I apologize for any inconvenience and look forward to meeting with you soon.
+
+Best regards,
+Oscar
+Viva Therapies
+Phone: +44 20 1234 5678
+Email: oscar@vivatherapies.com`
+            }
+        };
+        
+        function selectTemplate(templateId) {
+            currentTemplate = templateId;
+            
+            // Update active state
+            document.querySelectorAll('.template-card').forEach(card => card.classList.remove('active'));
+            event.target.closest('.template-card').classList.add('active');
+            
+            // Load template data
+            const templates = JSON.parse(localStorage.getItem('oscar_email_templates') || JSON.stringify(defaultTemplates));
+            const template = templates[templateId] || defaultTemplates[templateId];
+            
+            document.getElementById('templateName').value = template.name;
+            document.getElementById('emailSubject').value = template.subject;
+            document.getElementById('emailBody').value = template.body;
+            
+            document.getElementById('editorSection').style.display = 'block';
+            document.getElementById('previewSection').style.display = 'none';
+        }
+        
+        function saveTemplate() {
+            if (!currentTemplate) return;
+            
+            const templates = JSON.parse(localStorage.getItem('oscar_email_templates') || JSON.stringify(defaultTemplates));
+            
+            templates[currentTemplate] = {
+                name: document.getElementById('templateName').value,
+                subject: document.getElementById('emailSubject').value,
+                body: document.getElementById('emailBody').value
+            };
+            
+            localStorage.setItem('oscar_email_templates', JSON.stringify(templates));
+            
+            alert('Template saved successfully!');
+        }
+        
+        function previewTemplate() {
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            
+            const previewHtml = `
+                <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background: white;">
+                    <div style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                        <strong>Subject:</strong> ${subject.replace('{hotelName}', 'Sample Hotel').replace('{contactName}', 'John Smith')}
+                    </div>
+                    <div style="white-space: pre-line; line-height: 1.6;">
+                        ${body.replace(/{hotelName}/g, 'Sample Hotel').replace(/{contactName}/g, 'John Smith')}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('previewContent').innerHTML = previewHtml;
+            document.getElementById('previewSection').style.display = 'block';
+        }
+        
+        function resetTemplate() {
+            if (!currentTemplate) return;
+            
+            if (confirm('Reset template to default? This will lose any custom changes.')) {
+                const template = defaultTemplates[currentTemplate];
+                document.getElementById('emailSubject').value = template.subject;
+                document.getElementById('emailBody').value = template.body;
+            }
+        }
+    </script>
+</body>
+</html>

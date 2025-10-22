@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Dashboard - Oscar's Hotel Strategy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .email-list {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .email-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .email-info h4 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .email-info p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .email-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .status-sent {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-btn">← Back to Dashboard</a>
+        
+        <div class="header">
+            <h1>📧 Email Communication Dashboard</h1>
+            <p>Track and manage follow-up emails sent to hotel contacts</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalEmails">0</div>
+                    <div>Total Emails Sent</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="todayEmails">0</div>
+                    <div>Sent Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="weekEmails">0</div>
+                    <div>This Week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="monthEmails">0</div>
+                    <div>This Month</div>
+                </div>
+            </div>
+            
+            <div class="email-list">
+                <h2>Recent Email Communications</h2>
+                <div id="emailList">
+                    <p style="text-align: center; color: #666;">No emails sent yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/email-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEmailDashboard();
+        });
+        
+        function loadEmailDashboard() {
+            const emailLogs = getEmailLogs();
+            
+            // Calculate statistics
+            const now = new Date();
+            const today = now.toDateString();
+            const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            const todayCount = emailLogs.filter(email => 
+                new Date(email.sentAt).toDateString() === today
+            ).length;
+            
+            const weekCount = emailLogs.filter(email => 
+                new Date(email.sentAt) >= weekStart
+            ).length;
+            
+            const monthCount = emailLogs.filter(email => 
+                new Date(email.sentAt) >= monthStart
+            ).length;
+            
+            // Update statistics
+            document.getElementById('totalEmails').textContent = emailLogs.length;
+            document.getElementById('todayEmails').textContent = todayCount;
+            document.getElementById('weekEmails').textContent = weekCount;
+            document.getElementById('monthEmails').textContent = monthCount;
+            
+            // Display email list
+            displayEmailList(emailLogs);
+        }
+        
+        function displayEmailList(emails) {
+            const emailList = document.getElementById('emailList');
+            
+            if (emails.length === 0) {
+                emailList.innerHTML = '<p style="text-align: center; color: #666;">No emails sent yet.</p>';
+                return;
+            }
+            
+            // Sort by most recent first
+            emails.sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
+            
+            emailList.innerHTML = emails.map(email => `
+                <div class="email-item">
+                    <div class="email-info">
+                        <h4>${email.hotelName} - ${email.contactName}</h4>
+                        <p><strong>To:</strong> ${email.contactEmail}</p>
+                        <p><strong>Subject:</strong> ${email.subject}</p>
+                        <p><strong>Sent:</strong> ${new Date(email.sentAt).toLocaleString()}</p>
+                        <p><strong>Template:</strong> ${email.templateType.replace('_', ' ').toUpperCase()}</p>
+                    </div>
+                    <div class="email-status status-${email.status}">
+                        ${email.status.toUpperCase()}
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

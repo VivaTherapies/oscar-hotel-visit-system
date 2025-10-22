@@ -1,0 +1,27 @@
+{
+  "successful_meeting": {
+    "name": "Successful Meeting - Service Information",
+    "subject": "Thank you for meeting with Oscar - Viva Therapies Services",
+    "body": "Dear {contact_name},\n\nThank you for taking the time to meet with Oscar from Viva Therapies today at {hotel_name}.\n\nWe're excited about the opportunity to provide our premium wellness services to your guests. As discussed, our services include:\n\n\u2022 Professional Massage Therapy\n\u2022 Physiotherapy Services  \n\u2022 Personal Training Sessions\n\u2022 Yoga Instruction\n\u2022 Osteopathy Treatment\n\u2022 Comprehensive Wellness Programs\n\nOur team of certified professionals is ready to enhance your guests' experience with personalized wellness solutions.\n\nNext Steps:\n- We'll prepare a customized service proposal for {hotel_name}\n- Our team will contact you within 2 business days\n- We can arrange a trial service demonstration at your convenience\n\nPlease don't hesitate to contact us if you have any questions.\n\nBest regards,\nOscar Martinez\nBusiness Development Representative\nViva Therapies\nPhone: +44 20 1234 5678\nEmail: oscar@vivatherapies.com\nWebsite: www.vivatherapies.com"
+  },
+  "follow_up_required": {
+    "name": "Follow-up Required - Additional Information",
+    "subject": "Following up on our meeting - Viva Therapies",
+    "body": "Dear {contact_name},\n\nThank you for meeting with me today at {hotel_name}. \n\nAs requested, I'm following up with additional information about our services and how we can support {hotel_name}'s wellness offerings.\n\nI'll be in touch within the next few days with:\n- Detailed service brochures\n- Pricing information tailored to your needs\n- References from similar luxury hotels\n- Proposed implementation timeline\n\nIn the meantime, please feel free to reach out if you have any immediate questions.\n\nLooking forward to our continued discussion.\n\nBest regards,\nOscar Martinez\nBusiness Development Representative\nViva Therapies\nPhone: +44 20 1234 5678\nEmail: oscar@vivatherapies.com"
+  },
+  "not_interested": {
+    "name": "Thank You - Future Opportunities",
+    "subject": "Thank you for your time - Viva Therapies",
+    "body": "Dear {contact_name},\n\nThank you for taking the time to meet with me today at {hotel_name}.\n\nWhile I understand that our services may not be the right fit at this time, I appreciate the opportunity to learn more about {hotel_name}'s current wellness offerings and future plans.\n\nI'll keep your contact information on file and will reach out periodically with updates about new services or special offers that might be of interest.\n\nThank you again for your time and consideration.\n\nBest regards,\nOscar Martinez\nBusiness Development Representative\nViva Therapies\nPhone: +44 20 1234 5678\nEmail: oscar@vivatherapies.com"
+  },
+  "pricing_request": {
+    "name": "Pricing Information Request",
+    "subject": "Viva Therapies - Pricing Information for {hotel_name}",
+    "body": "Dear {contact_name},\n\nThank you for your interest in Viva Therapies services for {hotel_name}.\n\nAs requested during our meeting, I'm pleased to provide you with our pricing information and service packages.\n\nOur Services & Pricing:\n\u2022 Massage Therapy: \u00a380-120 per session\n\u2022 Physiotherapy: \u00a390-130 per session\n\u2022 Personal Training: \u00a370-100 per session\n\u2022 Yoga Classes: \u00a360-80 per session\n\u2022 Osteopathy: \u00a3100-140 per session\n\u2022 Wellness Programs: Custom pricing available\n\nWe offer flexible packages and volume discounts for hotels. All prices include:\n- Certified, insured professionals\n- All necessary equipment\n- Flexible scheduling\n- Guest satisfaction guarantee\n\nI'd be happy to discuss a customized package that meets {hotel_name}'s specific needs and budget.\n\nPlease let me know when would be convenient for a follow-up call.\n\nBest regards,\nOscar Martinez\nBusiness Development Representative\nViva Therapies\nPhone: +44 20 1234 5678\nEmail: oscar@vivatherapies.com"
+  },
+  "trial_service": {
+    "name": "Trial Service Offer",
+    "subject": "Complimentary Trial Service - Viva Therapies",
+    "body": "Dear {contact_name},\n\nFollowing our productive meeting at {hotel_name}, I'm pleased to offer a complimentary trial service to demonstrate the quality of our wellness offerings.\n\nTrial Service Options:\n\u2022 One complimentary massage session for your team\n\u2022 Free wellness consultation for interested guests\n\u2022 Demonstration of our mobile spa setup\n\u2022 Mini wellness workshop for your staff\n\nThis trial will allow you to experience firsthand the professional quality and guest satisfaction that Viva Therapies delivers.\n\nThe trial can be scheduled at your convenience and requires no commitment from {hotel_name}.\n\nPlease let me know which option interests you most, and I'll coordinate with our team to arrange the demonstration.\n\nLooking forward to showing you what we can offer.\n\nBest regards,\nOscar Martinez\nBusiness Development Representative\nViva Therapies\nPhone: +44 20 1234 5678\nEmail: oscar@vivatherapies.com"
+  }
+}

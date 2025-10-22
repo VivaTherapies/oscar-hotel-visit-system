@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Visit Form - Oscar's System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            background: #667eea;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .form-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .visit-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .form-content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .business-card-section {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            background: white;
+        }
+        
+        .upload-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px;
+        }
+        
+        .upload-button:hover {
+            background: #5a6fd8;
+        }
+        
+        .voice-section {
+            text-align: center;
+        }
+        
+        .voice-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .voice-button:hover {
+            background: #218838;
+        }
+        
+        .voice-button.recording {
+            background: #dc3545;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .transcript-area {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+            font-size: 1rem;
+        }
+        
+        .email-section {
+            background: #e8f4fd;
+            border: 1px solid #b3d9ff;
+        }
+        
+        .email-template-selector {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .email-preview {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .action-button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+        
+        .save-button {
+            background: #28a745;
+            color: white;
+        }
+        
+        .email-button {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .back-button {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .action-button:hover {
+            opacity: 0.9;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .auto-save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="auto-save-indicator" id="autoSaveIndicator">Auto-saved</div>
+    
+    <div class="container">
+        <div class="form-header">
+            <h1 id="hotelName">Hotel Visit Form</h1>
+            <div class="visit-info">
+            <div><strong>📅 Date:</strong> <span id="visitDate">Loading...</span></div>
+            <div><strong>⏰ Time:</strong> <span id="visitTime">Loading...</span></div>
+            <div><strong>Form Opened:</strong> <span id="formOpened">Loading...</span></div>
+            </div>
+        </div>
+        
+        <div class="form-content">
+            <div class="success-message" id="successMessage"></div>
+            
+            <!-- Basic Visit Information -->
+            <div class="section">
+                <div class="section-title">📋 Basic Visit Information</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Contact Person Name</label>
+                        <input type="text" class="form-input" id="contactName" placeholder="Enter contact name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact Person Role</label>
+                        <select class="form-input" id="contactRole">
+                            <option value="">Select role...</option>
+                            <option value="General Manager">General Manager</option>
+                            <option value="Concierge">Concierge</option>
+                            <option value="Spa Manager">Spa Manager</option>
+                            <option value="Guest Relations Manager">Guest Relations Manager</option>
+                            <option value="Front Office Manager">Front Office Manager</option>
+                            <option value="Sales Manager">Sales Manager</option>
+                            <option value="Marketing Manager">Marketing Manager</option>
+                            <option value="Operations Manager">Operations Manager</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Contact Email</label>
+                        <input type="email" class="form-input" id="contactEmail" placeholder="contact@hotel.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact Phone</label>
+                        <input type="tel" class="form-input" id="contactPhone" placeholder="+44 20 1234 5678">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Business Card Capture -->
+            <div class="section">
+                <div class="section-title">📇 Business Card Capture</div>
+                <div class="business-card-section">
+                    <p>Take a photo of the business card or upload from gallery</p>
+                    <div>
+                        <button class="upload-button" onclick="takePhoto()">📷 Take Photo</button>
+                        <button class="upload-button" onclick="uploadFromGallery()">📁 Upload from Gallery</button>
+                    </div>
+                    <input type="file" id="businessCardFile" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+                    <div id="cardPreview" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+            
+            <!-- Visit Summary -->
+            <div class="section">
+                <div class="section-title">📝 Visit Summary</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Visit Outcome</label>
+                    <select class="form-input" id="visitOutcome">
+                        <option value="">Select outcome...</option>
+                        <option value="Successful Meeting">Successful Meeting</option>
+                        <option value="Follow-up Required">Follow-up Required</option>
+                        <option value="Not Interested">Not Interested</option>
+                        <option value="Reschedule Needed">Reschedule Needed</option>
+                        <option value="Partnership Agreed">Partnership Agreed</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Visit Notes</label>
+                    <textarea class="form-input" id="visitNotes" rows="4" placeholder="Enter detailed notes about the visit..."></textarea>
+                </div>
+            </div>
+            
+            <!-- Voice-to-Text Summary -->
+            <div class="section">
+                <div class="section-title">🎤 Voice-to-Text Summary</div>
+                <div class="voice-section">
+                    <p>Record your visit summary and it will be converted to text</p>
+                    <button class="voice-button" id="voiceButton" onclick="toggleVoiceRecording()">🎤 Start Recording</button>
+                    <div class="transcript-area" id="voiceTranscript" placeholder="Voice transcript will appear here..."></div>
+                </div>
+            </div>
+            
+            <!-- Email Communication -->
+            <div class="section email-section">
+                <div class="section-title">📧 Send Follow-up Email</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Template</label>
+                    <select class="email-template-selector" id="emailTemplate" onchange="loadEmailTemplate()">
+                        <option value="">Select email template...</option>
+                        <option value="introduction">Introduction & Service Overview</option>
+                        <option value="followup">Post-Visit Follow-up</option>
+                        <option value="proposal">Service Proposal</option>
+                        <option value="thankyou">Thank You & Next Steps</option>
+                        <option value="appointment">Appointment Confirmation</option>
+                    </select>
+                </div>
+                
+                <div class="email-preview" id="emailPreview">
+                    Select a template to preview the email content
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Next Visit Date</label>
+                    <input type="date" class="form-input" id="nextVisitDate">
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button class="action-button back-button" onclick="goBack()">← Back to Schedule</button>
+                <button class="action-button save-button" onclick="saveVisitForm()">💾 Save Visit Form</button>
+                <button class="action-button email-button" onclick="sendFollowupEmail()">📧 Send Email</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let isRecording = false;
+        let recognition = null;
+        let autoSaveInterval = null;
+        
+        // Email templates
+        const emailTemplates = {
+            introduction: {
+                subject: "Welcome to Viva Therapies - London's Premier Mobile Spa Service",
+                body: `Dear [Customer Name],
+
+Thank you for your interest in Viva Therapies. We are delighted to introduce you to London's premier mobile spa service, bringing luxury wellness treatments directly to your location.
+
+Our Services:
+• Professional massage therapy
+• Facial treatments and skincare
+• Wellness consultations
+• Corporate wellness programs
+
+We would be honored to provide our services at your hotel and create exceptional experiences for your guests.
+
+I would love to schedule a meeting to discuss how we can partner together to enhance your guests' experience.
+
+Best regards,
+Oscar
+Viva Therapies
+Phone: +44 20 1234 5678
+Email: oscar@vivatherapies.com`
+            },
+            followup: {
+                subject: "Thank you for our meeting - Next Steps",
+                body: `Dear [Customer Name],
+
+Thank you for taking the time to meet with me today. It was a pleasure discussing how Viva Therapies can enhance your guests' experience with our premium mobile spa services.
+
+As discussed, our next steps are:
+• Prepare a customized service proposal
+• Schedule a trial treatment demonstration
+• Discuss partnership terms and commission structure
+
+I will follow up with you within the next 48 hours with our detailed proposal.
+
+Thank you again for your time and consideration.
+
+Best regards,
+Oscar
+Viva Therapies`
+            },
+            proposal: {
+                subject: "Viva Therapies Partnership Proposal",
+                body: `Dear [Customer Name],
+
+Following our productive meeting, I am pleased to present our partnership proposal for bringing Viva Therapies' premium mobile spa services to your esteemed establishment.
+
+Proposal Highlights:
+• Competitive commission structure
+• Professional, certified therapists
+• Flexible scheduling to meet your guests' needs
+• Comprehensive insurance coverage
+• 24/7 booking support
+
+Please find the detailed proposal attached. I would be happy to discuss any questions or modifications you may have.
+
+Looking forward to our partnership.
+
+Best regards,
+Oscar
+Viva Therapies`
+            },
+            thankyou: {
+                subject: "Thank you for choosing Viva Therapies",
+                body: `Dear [Customer Name],
+
+Thank you for choosing Viva Therapies as your wellness partner. We are excited to begin providing exceptional spa services to your guests.
+
+What's Next:
+• Service implementation within 7 days
+• Staff training and orientation
+• Marketing materials and guest information
+• 24/7 support contact details
+
+We look forward to a successful partnership and creating memorable wellness experiences for your guests.
+
+Warm regards,
+Oscar
+Viva Therapies`
+            },
+            appointment: {
+                subject: "Appointment Confirmation - Viva Therapies Visit",
+                body: `Dear [Customer Name],
+
+This email confirms our upcoming appointment:
+
+Date: [Date]
+Time: [Time]
+Location: [Hotel Name]
+Purpose: Partnership discussion and service presentation
+
+Please let me know if you need to reschedule or have any questions before our meeting.
+
+Looking forward to meeting with you.
+
+Best regards,
+Oscar
+Viva Therapies
+Phone: +44 20 1234 5678`
+            }
+        };
+        
+        // Initialize form
+        function initializeForm() {
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const hotel = urlParams.get('hotel');
+            const date = urlParams.get('date');
+            const time = urlParams.get('time');
+            
+            // Set form header information
+            if (hotel) {
+                document.getElementById('hotelName').textContent = `${hotel} Visit Form`;
+            }
+            
+            const now = new Date();
+            if (date) {
+                const dateObj = new Date(date);
+                document.getElementById(\'visitDate\').textContent = dateObj.toLocaleDateString(\'en-US\', { 
+                    weekday: \'long\', 
+                    year: \'numeric\', 
+                    month: \'long\', 
+                    day: \'numeric\' 
+                });
+            } else {
+                document.getElementById(\'visitDate\').textContent = now.toLocaleDateString(\'en-US\', { 
+                    weekday: \'long\', 
+                    year: \'numeric\', 
+                    month: \'long\', 
+                    day: \'numeric\' 
+                });
+            }
+            
+            if (time) {
+                document.getElementById(\'visitTime\').textContent = time;
+            } else {
+                document.getElementById(\'visitTime\').textContent = now.toLocaleTimeString(\'en-US\', { 
+                    hour: \'2-digit\', 
+                    minute: \'2-digit\' 
+                });
+            }
+
+            document.getElementById(\'formOpened\').textContent = now.toLocaleString(\'en-US\', {
+                year: \'numeric\', month: \'long\', day: \'numeric\',
+                hour: \'2-digit\', minute: \'2-digit\', second: \'2-digit\'
+            });
+            
+            // Set up auto-save
+            setupAutoSave();
+            
+            // Load existing data if available
+            loadExistingData();
+            
+            // Initialize speech recognition
+            initializeSpeechRecognition();
+        }
+        
+        function setupAutoSave() {
+            // Auto-save every 30 seconds
+            autoSaveInterval = setInterval(() => {
+                autoSaveForm();
+            }, 30000);
+            
+            // Save on input changes
+            const inputs = document.querySelectorAll('.form-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    setTimeout(autoSaveForm, 2000); // Save 2 seconds after last input
+                });
+            });
+        }
+        
+        function autoSaveForm() {
+            const formData = collectFormData();
+            const urlParams = new URLSearchParams(window.location.search);
+            const hotel = urlParams.get('hotel');
+            const date = urlParams.get('date');
+            const time = urlParams.get('time');
+            
+            if (hotel && date && time) {
+                const key = `visit_draft_${hotel}_${date}_${time}`;
+                localStorage.setItem(key, JSON.stringify(formData));
+                
+                // Show auto-save indicator
+                const indicator = document.getElementById('autoSaveIndicator');
+                indicator.style.display = 'block';
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 2000);
+            }
+        }
+        
+        function loadExistingData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hotel = urlParams.get('hotel');
+            const date = urlParams.get('date');
+            const time = urlParams.get('time');
+            
+            if (hotel && date && time) {
+                const key = `visit_draft_${hotel}_${date}_${time}`;
+                const savedData = localStorage.getItem(key);
+                
+                if (savedData) {
+                    const formData = JSON.parse(savedData);
+                    populateForm(formData);
+                }
+            }
+        }
+        
+        function collectFormData() {
+            return {
+                contactName: document.getElementById('contactName').value,
+                contactRole: document.getElementById('contactRole').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                contactPhone: document.getElementById('contactPhone').value,
+                visitOutcome: document.getElementById('visitOutcome').value,
+                visitNotes: document.getElementById('visitNotes').value,
+                voiceTranscript: document.getElementById('voiceTranscript').textContent,
+                nextVisitDate: document.getElementById('nextVisitDate').value
+            };
+        }
+        
+        function populateForm(data) {
+            document.getElementById('contactName').value = data.contactName || '';
+            document.getElementById('contactRole').value = data.contactRole || '';
+            document.getElementById('contactEmail').value = data.contactEmail || '';
+            document.getElementById('contactPhone').value = data.contactPhone || '';
+            document.getElementById('visitOutcome').value = data.visitOutcome || '';
+            document.getElementById('visitNotes').value = data.visitNotes || '';
+            document.getElementById('voiceTranscript').textContent = data.voiceTranscript || '';
+            document.getElementById('nextVisitDate').value = data.nextVisitDate || '';
+        }
+        
+        function initializeSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+                
+                recognition.onresult = function(event) {
+                    let transcript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                    document.getElementById('voiceTranscript').textContent = transcript;
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    stopRecording();
+                };
+                
+                recognition.onend = function() {
+                    stopRecording();
+                };
+            }
+        }
+        
+        function toggleVoiceRecording() {
+            if (!recognition) {
+                alert('Speech recognition is not supported in this browser.');
+                return;
+            }
+            
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+        
+        function startRecording() {
+            isRecording = true;
+            const button = document.getElementById('voiceButton');
+            button.textContent = '🛑 Stop Recording';
+            button.classList.add('recording');
+            
+            recognition.start();
+        }
+        
+        function stopRecording() {
+            isRecording = false;
+            const button = document.getElementById('voiceButton');
+            button.textContent = '🎤 Start Recording';
+            button.classList.remove('recording');
+            
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+        
+        function takePhoto() {
+            // In a real implementation, this would access the camera
+            document.getElementById('businessCardFile').click();
+        }
+        
+        function uploadFromGallery() {
+            document.getElementById('businessCardFile').click();
+        }
+        
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('cardPreview');
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" style="max-width: 200px; max-height: 150px; border-radius: 5px; border: 1px solid #ddd;">
+                        <p style="margin-top: 10px; color: #28a745;">✅ Business card uploaded successfully</p>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function loadEmailTemplate() {
+            const templateSelect = document.getElementById('emailTemplate');
+            const selectedTemplate = templateSelect.value;
+            const preview = document.getElementById('emailPreview');
+            
+            if (selectedTemplate && emailTemplates[selectedTemplate]) {
+                const template = emailTemplates[selectedTemplate];
+                const contactName = document.getElementById('contactName').value || '[Customer Name]';
+                const hotelName = document.getElementById('hotelName').textContent.replace(' Visit Form', '');
+                
+                let body = template.body.replace(/\[Customer Name\]/g, contactName);
+                body = body.replace(/\[Hotel Name\]/g, hotelName);
+                
+                preview.innerHTML = `
+                    <strong>Subject:</strong> ${template.subject}<br><br>
+                    <div style="white-space: pre-wrap;">${body}</div>
+                `;
+            } else {
+                preview.textContent = 'Select a template to preview the email content';
+            }
+        }
+        
+        function saveVisitForm() {
+            // Validate required fields
+            const contactName = document.getElementById('contactName').value;
+            const visitOutcome = document.getElementById('visitOutcome').value;
+            
+            if (!contactName || !visitOutcome) {
+                alert('Please fill in the Contact Name and Visit Outcome fields.');
+                return;
+            }
+            
+            // Collect all form data
+            const formData = collectFormData();
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Add URL parameters to form data
+            formData.hotel = urlParams.get('hotel');
+            formData.date = urlParams.get('date');
+            formData.time = urlParams.get('time');
+            formData.savedAt = new Date().toISOString();
+            
+            // Save to visit history
+            const visitHistory = JSON.parse(localStorage.getItem('visitHistory') || '[]');
+            visitHistory.push(formData);
+            localStorage.setItem('visitHistory', JSON.stringify(visitHistory));
+            
+            // Clear draft
+            const key = `visit_draft_${formData.hotel}_${formData.date}_${formData.time}`;
+            localStorage.removeItem(key);
+            
+            // Show success message
+            const successMsg = document.getElementById('successMessage');
+            successMsg.textContent = 'Visit form saved successfully!';
+            successMsg.style.display = 'block';
+            
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 5000);
+        }
+        
+        function sendFollowupEmail() {
+            const emailTemplate = document.getElementById('emailTemplate').value;
+            const contactEmail = document.getElementById('contactEmail').value;
+            
+            if (!emailTemplate) {
+                alert('Please select an email template.');
+                return;
+            }
+            
+            if (!contactEmail) {
+                alert('Please enter the contact email address.');
+                return;
+            }
+            
+            // In a real implementation, this would send the email via SMTP
+            // For now, we'll save to email history
+            const emailHistory = JSON.parse(localStorage.getItem('emailHistory') || '[]');
+            const template = emailTemplates[emailTemplate];
+            const contactName = document.getElementById('contactName').value || 'Valued Partner';
+            
+            emailHistory.push({
+                to: contactEmail,
+                subject: template.subject,
+                body: template.body.replace(/\[Customer Name\]/g, contactName),
+                sentAt: new Date().toISOString(),
+                hotel: new URLSearchParams(window.location.search).get('hotel')
+            });
+            
+            localStorage.setItem('emailHistory', JSON.stringify(emailHistory));
+            
+            alert('Follow-up email sent successfully!');
+        }
+        
+        function goBack() {
+            // Try to go back to the calendar or schedule
+            if (document.referrer) {
+                window.history.back();
+            } else {
+                window.location.href = 'oscar_calendar.html';
+            }
+        }
+        
+        // Initialize form on page load
+        document.addEventListener('DOMContentLoaded', initializeForm);
+        
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            if (autoSaveInterval) {
+                clearInterval(autoSaveInterval);
+            }
+            if (isRecording && recognition) {
+                recognition.stop();
+            }
+        });
+    </script>
+</body>
+</html>

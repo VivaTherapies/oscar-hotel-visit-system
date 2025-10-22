@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oscar's Live Calendar - Hotel Visit Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .calendar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .current-month {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .calendar-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .calendar-grid {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .weekday {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e1e5e9;
+        }
+        
+        .calendar-day {
+            background: white;
+            min-height: 120px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        
+        .calendar-day:hover {
+            background: #f8f9fa;
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .calendar-day.today {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .calendar-day.has-visits {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-color: #155724;
+        }
+
+        .all-visits-completed {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9a00 100%);
+            color: white;
+            border-color: #ff9a00;
+        }
+        
+        .calendar-day.other-month {
+            background: #f8f9fa;
+            color: #adb5bd;
+        }
+        
+        .day-number {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .visit-indicator {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-bottom: 2px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .visit-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .visits-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .visits-panel.active {
+            transform: translateY(0);
+        }
+        
+        .visits-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+            padding-bottom: 15px;
+        }
+        
+        .visits-panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .close-panel {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .visit-item.completed {
+            background: #d4edda; /* Light green for completed */
+            border-left-color: #28a745;
+        }
+
+        .visit-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .visit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .visit-hotel {
+            font-weight: 600;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .visit-time {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .visit-details {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .visit-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .visit-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-form {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-status {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn-email {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .visit-btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .calendar-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .calendar-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .calendar-day {
+                min-height: 80px;
+                padding: 5px;
+            }
+            
+            .day-number {
+                font-size: 14px;
+            }
+            
+            .visit-indicator {
+                font-size: 10px;
+                padding: 1px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📅 Oscar's Live Calendar</h1>
+        <button class="back-button" onclick="window.location.href='index.html'">← Back to Dashboard</button>
+    </div>
+
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <div class="calendar-nav">
+                <button class="nav-button" onclick="previousMonth()">← Previous</button>
+                <div class="current-month" id="currentMonth"></div>
+                <button class="nav-button" onclick="nextMonth()">Next →</button>
+            </div>
+            <div class="calendar-actions">
+                <button class="action-button" onclick="goToToday()">📅 Today</button>
+                <button class="action-button" onclick="exportCalendar()">📊 Export</button>
+                <button class="action-button" onclick="window.location.href='visit_scheduler.html'">➕ Schedule Visit</button>
+            </div>
+        </div>
+        
+        <div class="calendar-grid">
+            <div class="calendar-weekdays">
+                <div class="weekday">Sun</div>
+                <div class="weekday">Mon</div>
+                <div class="weekday">Tue</div>
+                <div class="weekday">Wed</div>
+                <div class="weekday">Thu</div>
+                <div class="weekday">Fri</div>
+                <div class="weekday">Sat</div>
+            </div>
+            <div class="calendar-days" id="calendarDays"></div>
+        </div>
+    </div>
+    
+    <!-- Visits Panel -->
+    <div class="visits-panel" id="visitsPanel">
+        <div class="visits-panel-header">
+            <div class="visits-panel-title" id="panelTitle">Visits for Selected Date</div>
+            <button class="close-panel" onclick="closeVisitsPanel()">✕ Close</button>
+        </div>
+        <div id="visitsList"></div>
+    </div>
+
+    <script src="unified_data_manager.js"></script>
+    <script>
+        let currentDate = new Date();
+        let visits = [];
+        let bills = [];
+        let invoices = [];
+        
+        // Initialize calendar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            renderCalendar();
+        });
+        
+        // Load all data
+        function loadData() {
+            visits = JSON.parse(localStorage.getItem('visits') || '[]');
+            bills = JSON.parse(localStorage.getItem('bills') || '[]');
+            invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            
+            // Also load calendar-specific visits
+            const calendarVisits = JSON.parse(localStorage.getItem('calendarVisits') || '[]');
+            
+            // Merge with existing visits (avoid duplicates)
+            calendarVisits.forEach(calVisit => {
+                if (!visits.find(v => v.id === calVisit.id)) {
+                    visits.push(calVisit);
+                }
+            });
+            
+            console.log(`Loaded ${visits.length} visits, ${bills.length} bills, ${invoices.length} invoices`);
+        }
+        
+        // Render calendar
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Update month display
+            document.getElementById('currentMonth').textContent = 
+                currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+            
+            // Get previous month days to fill the grid
+            const prevMonth = new Date(year, month, 0);
+            const daysInPrevMonth = prevMonth.getDate();
+            
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+            
+            // Add previous month days
+            for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+                const day = daysInPrevMonth - i;
+                const dayElement = createDayElement(day, true, new Date(year, month - 1, day));
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // Add current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = createDayElement(day, false, new Date(year, month, day));
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // Add next month days to fill the grid
+            const totalCells = calendarDays.children.length;
+            const remainingCells = 42 - totalCells; // 6 rows × 7 days
+            for (let day = 1; day <= remainingCells; day++) {
+                const dayElement = createDayElement(day, true, new Date(year, month + 1, day));
+                calendarDays.appendChild(dayElement);
+            }
+        }
+        
+        // Create day element
+        function createDayElement(day, isOtherMonth, date) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            
+            if (isOtherMonth) {
+                dayElement.classList.add('other-month');
+            }
+            
+            // Check if it's today
+            const today = new Date();
+            if (date.toDateString() === today.toDateString()) {
+                dayElement.classList.add('today');
+            }
+            
+            // Get visits for this date
+            const dateStr = date.toLocaleDateString(\'en-CA\', { year: \'numeric\', month: \'2-digit\', day: \'2-digit\' }).replace(/\//g, \'-\\\'); // YYYY-MM-DD format
+            const dayVisits = getVisitsForDate(dateStr);
+            const completedVisits = dayVisits.filter(v => v.status === \'completed\').length;
+            const pendingVisits = dayVisits.length - completedVisits;
+            const dayBills = getBillsForDate(dateStr);
+            const dayInvoices = getInvoicesForDate(dateStr);
+            
+            // Combine all events
+            const allEvents = [...dayVisits, ...dayBills, ...dayInvoices];
+            
+if (dayVisits.length > 0) {
+                if (pendingVisits === 0) {
+                    dayElement.classList.add(\'all-visits-completed\');
+                } else {
+                    dayElement.classList.add(\'has-visits\');
+                }
+            } else if (allEvents.length > 0) {
+                dayElement.classList.add(\'has-visits\');
+            }
+            
+            // Create day content
+            let dayContent = `<div class="day-number">${day}</div>`;
+            
+            // Add visit indicators
+            allEvents.slice(0, 3).forEach(event => {
+                if (event.type === 'visit') {
+                    dayContent += `<div class="visit-indicator">📅 ${event.time} ${event.hotel}</div>`;
+                } else if (event.type === 'bill') {
+                    dayContent += `<div class="visit-indicator">💰 Bill: £${event.amount}</div>`;
+                } else if (event.type === 'invoice') {
+                    dayContent += `<div class="visit-indicator">📄 Invoice: £${event.amount}</div>`;
+                }
+            });
+            
+            // Add count indicator if more than 3 events
+            if (allEvents.length > 3) {
+                dayContent += `<div class="visit-count">${allEvents.length}</div>`;
+            } else if (allEvents.length > 0) {
+                dayContent += `<div class="visit-count">${allEvents.length}</div>`;
+            }
+            
+            dayElement.innerHTML = dayContent;
+            
+            // Add click handler
+            dayElement.addEventListener('click', () => showVisitsForDate(date, allEvents));
+            
+            return dayElement;
+        }
+        
+        // Get visits for specific date
+        function getVisitsForDate(dateStr) {
+            return visits
+                .filter(visit => visit.date === dateStr)
+                .map(visit => ({
+                    ...visit,
+                    type: 'visit'
+                }));
+        }
+        
+        // Get bills for specific date
+        function getBillsForDate(dateStr) {
+            return bills
+                .filter(bill => bill.date === dateStr)
+                .map(bill => ({
+                    ...bill,
+                    type: 'bill'
+                }));
+        }
+        
+        // Get invoices for specific date
+        function getInvoicesForDate(dateStr) {
+            return invoices
+                .filter(invoice => invoice.date === dateStr)
+                .map(invoice => ({
+                    ...invoice,
+                    type: 'invoice'
+                }));
+        }
+        
+        // Show visits panel for selected date
+        function showVisitsForDate(date, events) {
+            const panel = document.getElementById('visitsPanel');
+            const title = document.getElementById('panelTitle');
+            const list = document.getElementById('visitsList');
+            
+            title.textContent = `Events for ${date.toLocaleDateString('en-GB', { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            })}`;
+            
+            if (events.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <p>No events scheduled for this date</p>
+                        <button class="visit-btn btn-form" onclick="scheduleNewVisit('${date.toISOString().split('T')[0]}')">
+                            📅 Schedule Visit
+                        </button>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = events.map(event => {
+                    if (event.type === 'visit') {
+                        return createVisitItem(event);
+                    } else if (event.type === 'bill') {
+                        return createBillItem(event);
+                    } else if (event.type === 'invoice') {
+                        return createInvoiceItem(event);
+                    }
+                }).join('');
+            }
+            
+            panel.classList.add('active');
+        }
+        
+        // Create visit item HTML
+        function createVisitItem(visit) {
+            const isCompleted = visit.status === \'completed\';
+            return `
+                <div class="visit-item ${isCompleted ? \'completed\' : \'\'}">
+                    <div class="visit-header">
+                        <div class="visit-hotel">📅 ${visit.hotelName || visit.hotel}</div>
+                        <div class="visit-time">${visit.time} (${visit.duration || 60} min)</div>
+                    </div>
+                    <div class="visit-details">
+                        Purpose: ${formatPurpose(visit.purpose)}<br>
+                        ${visit.contactPerson ? `Contact: ${visit.contactPerson}<br>` : ''}
+                        ${visit.notes ? `Notes: ${visit.notes}<br>` : ''}
+                        Status: <strong>${visit.status || 'scheduled'}</strong>
+                    </div>
+                    <div class="visit-actions">
+                        <button class="visit-btn btn-form" onclick="openVisitForm('${visit.id}')">📋 Open Form</button>
+                      <button class="visit-btn btn-status" onclick="toggleVisitStatus(\'${visit.id}\')">${isCompleted ? \'Mark as Pending\' : \'Mark as Completed\'}</button>
+                        <button class="visit-btn btn-email" onclick="sendVisitEmail('${visit.id}')">📧 Send Email</button>
+                        <button class="visit-btn btn-delete" onclick="deleteVisit('${visit.id}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Create bill item HTML
+        function createBillItem(bill) {
+            return `
+                <div class="visit-item ${isCompleted ? \'completed\' : \'\'}">
+                    <div class="visit-header">
+                        <div class="visit-hotel">💰 Bill - ${bill.hotel || 'Hotel'}</div>
+                        <div class="visit-time">£${bill.amount}</div>
+                    </div>
+                    <div class="visit-details">
+                        Description: ${bill.description || 'N/A'}<br>
+                        Status: <strong>${bill.status || 'pending'}</strong>
+                    </div>
+                    <div class="visit-actions">
+                        <button class="visit-btn btn-form" onclick="viewBill('${bill.id}')">👁️ View Bill</button>
+                        <button class="visit-btn btn-status" onclick="updateBillStatus('${bill.id}')">📅 Update Status</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Create invoice item HTML
+        function createInvoiceItem(invoice) {
+            return `
+                <div class="visit-item ${isCompleted ? \'completed\' : \'\'}">
+                    <div class="visit-header">
+                        <div class="visit-hotel">📄 Invoice - ${invoice.hotel || 'Hotel'}</div>
+                        <div class="visit-time">£${invoice.amount}</div>
+                    </div>
+                    <div class="visit-details">
+                        Description: ${invoice.description || 'N/A'}<br>
+                        Status: <strong>${invoice.status || 'pending'}</strong>
+                    </div>
+                    <div class="visit-actions">
+                        <button class="visit-btn btn-form" onclick="viewInvoice('${invoice.id}')">👁️ View Invoice</button>
+                        <button class="visit-btn btn-status" onclick="updateInvoiceStatus('${invoice.id}')">📅 Update Status</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Close visits panel
+        function closeVisitsPanel() {
+            document.getElementById(\'visitsPanel\').classList.remove(\'active\');
+        }
+
+        // Toggle visit status
+        function toggleVisitStatus(visitId) {
+            const visitIndex = visits.findIndex(v => v.id === visitId);
+            if (visitIndex !== -1) {
+                visits[visitIndex].status = visits[visitIndex].status === \'completed\' ? \'scheduled\' : \'completed\';
+                saveData();
+                renderCalendar();
+                // Re-render the visits panel for the current date if it's open
+                const panel = document.getElementById(\'visitsPanel\');
+                if (panel.classList.contains(\'active\')) {
+                    const currentDay = new Date(document.getElementById(\'panelTitle\').textContent.split(\' for \')[1]);
+                    const dateStr = currentDay.toLocaleDateString(\'en-CA\', { year: \'numeric\', month: \'2-digit\', day: \'2-digit\' }).replace(/\//g, \'-\\\');
+                    const dayVisits = getVisitsForDate(dateStr);
+                    const dayBills = getBillsForDate(dateStr);
+                    const dayInvoices = getInvoicesForDate(dateStr);
+                    showVisitsForDate(currentDay, [...dayVisits, ...dayBills, ...dayInvoices]);
+                }
+            }
+        }
+        
+        // Navigation functions
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+        
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+        
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+        
+        // Utility functions
+        function formatPurpose(purpose) {
+            const purposes = {
+                'business_meeting': 'Business Meeting',
+                'client_visit': 'Client Visit',
+                'service_presentation': 'Service Presentation',
+                'contract_discussion': 'Contract Discussion',
+                'follow_up': 'Follow-up Meeting',
+                'partnership_review': 'Partnership Review'
+            };
+            return purposes[purpose] || purpose;
+        }
+        
+        // Action functions
+        function openVisitForm(visitId) {
+            const visit = visits.find(v => v.id === visitId);
+            if (!visit) return;
+            
+            localStorage.setItem('currentVisit', JSON.stringify(visit));
+            localStorage.setItem('returnUrl', window.location.href);
+            
+            // Determine form URL
+            const hotelName = (visit.hotelName || visit.hotel || '').toLowerCase();
+            let formUrl = 'forms/generic_form.html';
+            
+            if (hotelName.includes('claridge')) formUrl = 'forms/claridges_form.html';
+            else if (hotelName.includes('ritz')) formUrl = 'forms/ritz_form.html';
+            else if (hotelName.includes('dorchester')) formUrl = 'forms/dorchester_form.html';
+            else if (hotelName.includes('savoy')) formUrl = 'forms/savoy_form.html';
+            
+            window.location.href = formUrl;
+        }
+        
+        function updateVisitStatus(visitId) {
+            const visit = visits.find(v => v.id === visitId);
+            if (!visit) return;
+            
+            const statuses = ['scheduled', 'in_progress', 'completed', 'cancelled'];
+            const currentIndex = statuses.indexOf(visit.status || 'scheduled');
+            const nextIndex = (currentIndex + 1) % statuses.length;
+            
+            visit.status = statuses[nextIndex];
+            localStorage.setItem('visits', JSON.stringify(visits));
+            
+            showNotification(`Visit status updated to: ${visit.status}`, 'success');
+            renderCalendar();
+            closeVisitsPanel();
+        }
+        
+        function sendVisitEmail(visitId) {
+            const visit = visits.find(v => v.id === visitId);
+            if (!visit) return;
+            
+            if (window.businessEmailManager) {
+                window.businessEmailManager.sendBusinessEmail('followUp', visit);
+                showNotification('Follow-up email sent!', 'success');
+            } else {
+                showNotification('Email system not available', 'error');
+            }
+        }
+        
+        function deleteVisit(visitId) {
+            if (confirm('Are you sure you want to delete this visit?')) {
+                visits = visits.filter(v => v.id !== visitId);
+                localStorage.setItem('visits', JSON.stringify(visits));
+                showNotification('Visit deleted successfully', 'success');
+                renderCalendar();
+                closeVisitsPanel();
+            }
+        }
+        
+        function scheduleNewVisit(date) {
+            localStorage.setItem('preselectedDate', date);
+            window.location.href = 'visit_scheduler.html';
+        }
+        
+        function exportCalendar() {
+            const data = {
+                visits: visits,
+                bills: bills,
+                invoices: invoices,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `oscar-calendar-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Calendar exported successfully!', 'success');
+        }
+        
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideInRight 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Close panel when clicking outside
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('visitsPanel');
+            if (panel.classList.contains('active') && !panel.contains(e.target) && !e.target.closest('.calendar-day')) {
+                closeVisitsPanel();
+            }
+        });
+    </script>
+    
+    <style>
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</body>
+</html>

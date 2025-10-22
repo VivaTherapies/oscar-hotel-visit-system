@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Hub - Oscar's System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .communication-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 80vh;
+        }
+        
+        .chat-section, .email-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            max-height: 400px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        
+        .message.sent {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .message.received {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+        
+        .send-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+        
+        .send-button:hover {
+            background: #5a6fd8;
+        }
+        
+        .email-templates {
+            margin-bottom: 15px;
+        }
+        
+        .template-selector {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .template-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .template-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-template-btn {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .save-template-btn {
+            background: #28a745;
+            color: white;
+            display: none;
+        }
+        
+        .cancel-edit-btn {
+            background: #6c757d;
+            color: white;
+            display: none;
+        }
+        
+        .template-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .email-compose {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .email-input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .email-input:focus {
+            border-color: #667eea;
+        }
+        
+        .email-textarea {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 250px;
+            font-family: inherit;
+            outline: none;
+        }
+        
+        .email-textarea:focus {
+            border-color: #667eea;
+        }
+        
+        .email-textarea.editing {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        
+        .email-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .email-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-button {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .send-email-button {
+            background: #28a745;
+            color: white;
+        }
+        
+        .email-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .online-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #e8f5e8;
+            border-radius: 5px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border-radius: 50%;
+        }
+        
+        .edit-indicator {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">← Back to Dashboard</button>
+    
+    <div class="container">
+        <div class="header">
+            <h1>💬 Communication Hub</h1>
+            <p>Team Chat & Customer Email Communication</p>
+        </div>
+        
+        <div class="communication-grid">
+            <!-- Chat Section -->
+            <div class="chat-section">
+                <div class="section-header">💬 Team Chat</div>
+                
+                <div class="online-status">
+                    <div class="status-dot"></div>
+                    <span>Office Team Online</span>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message received">
+                        <div>Welcome to the team chat! Use this to communicate with the office team in real-time.</div>
+                        <div class="message-time">System Message</div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeypress="handleChatKeyPress(event)">
+                    <button class="send-button" onclick="sendChatMessage()">Send</button>
+                </div>
+            </div>
+            
+            <!-- Email Section -->
+            <div class="email-section">
+                <div class="section-header">📧 Customer Email</div>
+                
+                <div class="email-templates">
+                    <select class="template-selector" id="emailTemplate" onchange="loadEmailTemplate()">
+                        <option value="">Select Email Template</option>
+                        <option value="introduction">Introduction & Service Overview</option>
+                        <option value="followup">Post-Visit Follow-up</option>
+                        <option value="proposal">Service Proposal</option>
+                        <option value="thankyou">Thank You & Next Steps</option>
+                        <option value="appointment">Appointment Confirmation</option>
+                    </select>
+                </div>
+                
+                <div class="template-actions">
+                    <button class="template-btn edit-template-btn" id="editTemplateBtn" onclick="editTemplate()">
+                        ✏️ Edit Template
+                    </button>
+                    <button class="template-btn save-template-btn" id="saveTemplateBtn" onclick="saveTemplate()">
+                        💾 Save Changes
+                    </button>
+                    <button class="template-btn cancel-edit-btn" id="cancelEditBtn" onclick="cancelEdit()">
+                        ❌ Cancel
+                    </button>
+                </div>
+                
+                <div class="edit-indicator" id="editIndicator">
+                    📝 Template editing mode - Make your changes and click "Save Changes"
+                </div>
+                
+                <div class="email-compose">
+                    <input type="email" class="email-input" id="customerEmail" placeholder="Customer Email Address">
+                    <input type="text" class="email-input" id="emailSubject" placeholder="Email Subject">
+                    <textarea class="email-textarea" id="emailBody" placeholder="Email content will appear here when you select a template..."></textarea>
+                    
+                    <div class="email-actions">
+                        <button class="email-button preview-button" onclick="previewEmail()">👁️ Preview</button>
+                        <button class="email-button send-email-button" onclick="sendCustomerEmail()">📧 Send Email</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let isEditingTemplate = false;
+        let originalTemplate = null;
+        
+        // Email templates
+        const emailTemplates = {
+            introduction: {
+                subject: "Welcome to Viva Therapies - London's Premier Mobile Spa Service",
+                body: `Dear [Customer Name],
+
+Thank you for your interest in Viva Therapies. We are delighted to introduce you to London's premier mobile spa service, bringing luxury wellness treatments directly to your location.
+
+Our Services:
+• Professional massage therapy
+• Facial treatments and skincare
+• Wellness consultations
+• Corporate wellness programs
+
+We would be honored to provide our services at your hotel and create exceptional experiences for your guests.
+
+I would love to schedule a meeting to discuss how we can partner together to enhance your guests' experience.
+
+Best regards,
+Oscar
+Viva Therapies
+Phone: +44 20 1234 5678
+Email: oscar@vivatherapies.com`
+            },
+            followup: {
+                subject: "Thank you for our meeting - Next Steps",
+                body: `Dear [Customer Name],
+
+Thank you for taking the time to meet with me today. It was a pleasure discussing how Viva Therapies can enhance your guests' experience with our premium mobile spa services.
+
+As discussed, our next steps are:
+• Prepare a customized service proposal
+• Schedule a trial treatment demonstration
+• Discuss partnership terms and commission structure
+
+I will follow up with you within the next 48 hours with our detailed proposal.
+
+Thank you again for your time and consideration.
+
+Best regards,
+Oscar
+Viva Therapies`
+            },
+            proposal: {
+                subject: "Viva Therapies Partnership Proposal",
+                body: `Dear [Customer Name],
+
+Following our productive meeting, I am pleased to present our partnership proposal for bringing Viva Therapies' premium mobile spa services to your esteemed establishment.
+
+Proposal Highlights:
+• Competitive commission structure
+• Professional, certified therapists
+• Flexible scheduling to meet your guests' needs
+• Comprehensive insurance coverage
+• 24/7 booking support
+
+Please find the detailed proposal attached. I would be happy to discuss any questions or modifications you may have.
+
+Looking forward to our partnership.
+
+Best regards,
+Oscar
+Viva Therapies`
+            },
+            thankyou: {
+                subject: "Thank you for choosing Viva Therapies",
+                body: `Dear [Customer Name],
+
+Thank you for choosing Viva Therapies as your wellness partner. We are thrilled to begin this journey with you and provide exceptional spa services to your valued guests.
+
+Next Steps:
+• Complete setup and onboarding process
+• Schedule staff training session
+• Begin accepting bookings from your guests
+• Regular check-ins to ensure satisfaction
+
+We appreciate your trust in our services and look forward to a successful partnership.
+
+Best regards,
+Oscar
+Viva Therapies`
+            },
+            appointment: {
+                subject: "Appointment Confirmation - Viva Therapies",
+                body: `Dear [Customer Name],
+
+This email confirms your appointment with Viva Therapies:
+
+Date: [Date]
+Time: [Time]
+Location: [Hotel Name]
+Service: [Service Details]
+
+Our professional therapist will arrive 15 minutes before the scheduled time to set up. Please ensure the treatment space is available and accessible.
+
+If you need to reschedule or have any questions, please contact us at least 24 hours in advance.
+
+Thank you for choosing Viva Therapies.
+
+Best regards,
+Oscar
+Viva Therapies`
+            }
+        };
+        
+        // Load saved templates from localStorage
+        function loadSavedTemplates() {
+            const saved = localStorage.getItem('emailTemplates');
+            if (saved) {
+                try {
+                    const savedTemplates = JSON.parse(saved);
+                    Object.assign(emailTemplates, savedTemplates);
+                } catch (e) {
+                    console.error('Error loading saved templates:', e);
+                }
+            }
+        }
+        
+        // Save templates to localStorage
+        function saveTemplatesToStorage() {
+            localStorage.setItem('emailTemplates', JSON.stringify(emailTemplates));
+        }
+        
+        // Load email template
+        function loadEmailTemplate() {
+            const templateKey = document.getElementById('emailTemplate').value;
+            const subjectField = document.getElementById('emailSubject');
+            const bodyField = document.getElementById('emailBody');
+            
+            if (templateKey && emailTemplates[templateKey]) {
+                subjectField.value = emailTemplates[templateKey].subject;
+                bodyField.value = emailTemplates[templateKey].body;
+            } else {
+                subjectField.value = '';
+                bodyField.value = '';
+            }
+            
+            // Reset editing mode
+            if (isEditingTemplate) {
+                cancelEdit();
+            }
+        }
+        
+        // Edit template functionality
+        function editTemplate() {
+            const templateKey = document.getElementById('emailTemplate').value;
+            if (!templateKey) {
+                alert('Please select a template first');
+                return;
+            }
+            
+            isEditingTemplate = true;
+            originalTemplate = {
+                subject: document.getElementById('emailSubject').value,
+                body: document.getElementById('emailBody').value
+            };
+            
+            // Update UI
+            document.getElementById('editTemplateBtn').style.display = 'none';
+            document.getElementById('saveTemplateBtn').style.display = 'inline-block';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+            document.getElementById('editIndicator').style.display = 'block';
+            
+            // Add editing class to textarea
+            document.getElementById('emailBody').classList.add('editing');
+            document.getElementById('emailSubject').classList.add('editing');
+        }
+        
+        // Save template changes
+        function saveTemplate() {
+            const templateKey = document.getElementById('emailTemplate').value;
+            if (!templateKey) return;
+            
+            const newSubject = document.getElementById('emailSubject').value;
+            const newBody = document.getElementById('emailBody').value;
+            
+            // Update template
+            emailTemplates[templateKey] = {
+                subject: newSubject,
+                body: newBody
+            };
+            
+            // Save to localStorage
+            saveTemplatesToStorage();
+            
+            // Reset UI
+            cancelEdit();
+            
+            // Show success message
+            showNotification('Template saved successfully!', 'success');
+        }
+        
+        // Cancel editing
+        function cancelEdit() {
+            if (isEditingTemplate && originalTemplate) {
+                document.getElementById('emailSubject').value = originalTemplate.subject;
+                document.getElementById('emailBody').value = originalTemplate.body;
+            }
+            
+            isEditingTemplate = false;
+            originalTemplate = null;
+            
+            // Reset UI
+            document.getElementById('editTemplateBtn').style.display = 'inline-block';
+            document.getElementById('saveTemplateBtn').style.display = 'none';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('editIndicator').style.display = 'none';
+            
+            // Remove editing class
+            document.getElementById('emailBody').classList.remove('editing');
+            document.getElementById('emailSubject').classList.remove('editing');
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 1000;
+                padding: 12px 20px; border-radius: 8px; color: white;
+                font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+        
+        // Preview email
+        function previewEmail() {
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            
+            if (!subject || !body) {
+                alert('Please select a template or enter email content');
+                return;
+            }
+            
+            const previewWindow = window.open('', '_blank', 'width=600,height=500');
+            previewWindow.document.write(`
+                <html>
+                <head><title>Email Preview</title></head>
+                <body style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h3>Email Preview</h3>
+                    <p><strong>To:</strong> ${customerEmail || '[Customer Email]'}</p>
+                    <p><strong>Subject:</strong> ${subject}</p>
+                    <hr>
+                    <div style="white-space: pre-wrap;">${body}</div>
+                </body>
+                </html>
+            `);
+        }
+        
+        // Send customer email
+        function sendCustomerEmail() {
+            const customerEmail = document.getElementById('customerEmail').value;
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            
+            if (!customerEmail) {
+                alert('Please enter customer email address');
+                return;
+            }
+            
+            if (!subject || !body) {
+                alert('Please select a template or enter email content');
+                return;
+            }
+            
+            // Create mailto link
+            const mailtoLink = `mailto:${customerEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
+            
+            showNotification('Email client opened successfully!', 'success');
+        }
+        
+        // Chat functionality
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+        
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                const chatMessages = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message sent';
+                messageDiv.innerHTML = `
+                    <div>${message}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                `;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                input.value = '';
+                
+                // Simulate office response (optional)
+                setTimeout(() => {
+                    const responseDiv = document.createElement('div');
+                    responseDiv.className = 'message received';
+                    responseDiv.innerHTML = `
+                        <div>Message received. The office team will respond shortly.</div>
+                        <div class="message-time">Office Team</div>
+                    `;
+                    chatMessages.appendChild(responseDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedTemplates();
+        });
+    </script>
+</body>
+</html>
